@@ -1,0 +1,173 @@
+.field-editor {
+  background: white;
+}
+
+.field-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.field-editor-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.field-editor-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.option-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.option-item .input {
+  flex: 1;
+}
+
+.option-item .btn {
+  min-width: 40px;
+  padding: 8px 12px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.no-options-text {
+  color: #9ca3af;
+  font-size: 14px;
+  font-style: italic;
+  padding: 10px;
+  text-align: center;
+}
+
+.help-text {
+  display: block;
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+}
+
+.field-renderer {
+  width: 100%;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 4px;
+}
+
+.field-input,
+.field-textarea,
+.field-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.field-input:focus,
+.field-textarea:focus,
+.field-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.radio-group,
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radio-label,
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.radio-label input,
+.checkbox-label input {
+  width: auto;
+  cursor: pointer;
+}
+
+.rating-group {
+  display: flex;
+  gap: 4px;
+}
+
+.rating-star {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #d1d5db;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.rating-star.filled {
+  color: #fbbf24;
+}
+
+.rating-star:hover {
+  color: #fbbf24;
+}
+
+.field-description {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.field-placeholder {
+  padding: 20px;
+  border: 2px dashed #d1d5db;
+  border-radius: 6px;
+  text-align: center;
+  color: #9ca3af;
+}

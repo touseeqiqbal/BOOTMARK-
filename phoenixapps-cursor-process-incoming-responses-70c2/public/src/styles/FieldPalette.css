@@ -1,0 +1,90 @@
+.field-palette {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  height: fit-content;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  position: sticky;
+  top: 80px;
+}
+
+.field-palette h3 {
+  margin-bottom: 15px;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.field-palette-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-category {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #f9fafb;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.category-header:hover {
+  background: #f3f4f6;
+}
+
+.category-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.5px;
+}
+
+.category-toggle {
+  font-size: 18px;
+  color: #9ca3af;
+  font-weight: 300;
+}
+
+.field-palette-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+
+.field-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: grab;
+  transition: all 0.2s;
+  background: white;
+}
+
+.field-palette-item:hover {
+  background: #f9fafb;
+  border-color: #4f46e5;
+}
+
+.field-palette-item.dragging {
+  opacity: 0.5;
+}
+
+.field-palette-item span {
+  font-size: 14px;
+  color: #374151;
+}

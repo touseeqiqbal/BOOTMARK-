@@ -1,0 +1,78 @@
+.form-field-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 15px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f9fafb;
+}
+
+.form-field-wrapper:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.form-field-wrapper.selected {
+  border-color: #4f46e5;
+  background: #eef2ff;
+}
+
+.form-field-wrapper.dragging {
+  opacity: 0.5;
+}
+
+.form-field-wrapper.drag-over {
+  border-color: #4f46e5;
+  border-style: dashed;
+}
+
+.field-handle {
+  cursor: grab;
+  color: #9ca3af;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.field-handle:active {
+  cursor: grabbing;
+}
+
+.field-content {
+  flex: 1;
+  pointer-events: none;
+}
+
+.field-actions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.form-field-wrapper:hover .field-actions {
+  opacity: 1;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: #6b7280;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.icon-btn.danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}

@@ -1,0 +1,42 @@
+.form-canvas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-canvas {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  min-height: 400px;
+}
+
+.empty-canvas {
+  text-align: center;
+  padding: 80px 20px;
+  color: #9ca3af;
+}
+
+.empty-canvas p {
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.empty-canvas .hint {
+  font-size: 14px;
+  color: #d1d5db;
+}
+
+.fields-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fields-list.drag-over {
+  background: #f0f9ff;
+  border: 2px dashed #4f46e5;
+  border-radius: 8px;
+  padding: 10px;
+}
+

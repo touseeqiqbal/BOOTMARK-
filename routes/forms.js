@@ -229,9 +229,27 @@ router.post("/", async (req, res) => {
 
     // If Firestore configured, store form there and return early
     if (useFirestore) {
-      await db.collection('forms').doc(newForm.id).set(newForm)
-      console.log("Form created in Firestore:", newForm.id)
-      return res.status(201).json(newForm)
+      try {
+        await db.collection('forms').doc(newForm.id).set(newForm)
+        console.log("Form created in Firestore:", newForm.id)
+        return res.status(201).json(newForm)
+      } catch (firestoreError) {
+        // Handle Firestore authentication errors
+        if (firestoreError.code === 16 || firestoreError.code === 7) {
+          console.error('❌ Firestore authentication error when creating form:')
+          console.error('   Error code:', firestoreError.code)
+          console.error('   Error message:', firestoreError.message)
+          console.error('   This means FIREBASE_SERVICE_ACCOUNT is not configured correctly in Render.')
+          console.error('   Check Render logs at startup for credential initialization errors.')
+          return res.status(500).json({ 
+            error: 'Firestore authentication failed. Please check server configuration.',
+            details: 'The server cannot authenticate with Firestore. This is a server-side configuration issue.',
+            code: firestoreError.code
+          })
+        }
+        // Re-throw other errors to be handled by outer catch
+        throw firestoreError
+      }
     }
 
     forms.push(newForm);

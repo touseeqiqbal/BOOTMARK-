@@ -286,10 +286,48 @@ The application supports Google Firestore as a database backend. To use Firestor
 4. **Verify Firestore is Working**:
    - After deployment, check Render logs
    - You should see: `✅ Firebase Admin initialized from FIREBASE_SERVICE_ACCOUNT environment variable`
-   - And: `✅ Firestore database initialized successfully`
+   - You should see: `✅ Firestore database initialized successfully`
+   - You should see: `✅ Firestore credentials verified successfully`
    - Check Firebase Console → Firestore Database to see data appearing
 
-5. **Benefits of Firestore on Render**:
+5. **Troubleshooting Firestore Authentication Errors**:
+   
+   If you see errors like:
+   ```
+   Error: 16 UNAUTHENTICATED: Request had invalid authentication credentials
+   ```
+   
+   This means the `FIREBASE_SERVICE_ACCOUNT` environment variable is not set correctly. Follow these steps:
+   
+   1. **Run the helper script locally**:
+      ```bash
+      node scripts/prepare-firestore-env.js
+      ```
+      This will output the exact values you need to copy.
+   
+   2. **Check Render Environment Variables**:
+      - Go to Render Dashboard → Your Service → Environment → Environment Variables
+      - Verify `FIREBASE_SERVICE_ACCOUNT` is set
+      - Verify `FIREBASE_PROJECT_ID` is set
+      - Make sure `FIREBASE_SERVICE_ACCOUNT` is a single-line JSON string (no line breaks)
+   
+   3. **Common Issues**:
+      - ❌ **Missing quotes**: The JSON string must be properly quoted in the environment variable
+      - ❌ **Line breaks**: JSON must be on a single line (use the helper script)
+      - ❌ **Incomplete JSON**: Make sure all fields from the service account file are included
+      - ❌ **Wrong variable name**: Must be exactly `FIREBASE_SERVICE_ACCOUNT` (case-sensitive)
+   
+   4. **Verify in Render Logs**:
+      After setting the variables, check startup logs:
+      - ✅ You should see: `✅ Firebase Admin initialized from FIREBASE_SERVICE_ACCOUNT environment variable`
+      - ✅ You should see: `✅ Firestore credentials verified successfully`
+      - ❌ If you see: `❌ Firestore authentication failed!` - your credentials are invalid
+   
+   5. **Get a Fresh Service Account** (if needed):
+      - Firebase Console → Project Settings → Service Accounts
+      - Generate a new private key if the old one is expired or revoked
+
+6. **Benefits of Firestore on Render**:
    - ✅ No file system dependencies (works better on cloud platforms)
    - ✅ Automatic backups
    - ✅ Scalable database

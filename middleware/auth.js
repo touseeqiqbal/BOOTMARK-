@@ -1,29 +1,20 @@
 const admin = require("firebase-admin");
-const fs = require("fs");
-const path = require("path");
 
-// Initialize Firebase Admin from Render Secret File
+// Initialize Firebase Admin if available
 let firebaseInitialized = false;
 try {
-  const serviceAccountPath = "/etc/secrets/firebase-service-account.json"; // Update if your secret file name is different
-
-  if (fs.existsSync(serviceAccountPath)) {
-    const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
-
-    // Fix private_key line breaks
-    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
-
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
-
     firebaseInitialized = true;
-    console.log("✅ Firebase Admin initialized from secret file");
-  } else {
-    console.warn("⚠️ Firebase service account secret file not found, skipping Firebase Admin init");
+  } else if (process.env.FIREBASE_PROJECT_ID) {
+    admin.initializeApp();
+    firebaseInitialized = true;
   }
 } catch (error) {
-  console.warn("⚠️ Firebase Admin init failed:", error.message);
+  console.warn("Firebase Admin not initialized in middleware. Using fallback.");
 }
 
 exports.authRequired = async (req, res, next) => {
@@ -49,27 +40,58 @@ exports.authRequired = async (req, res, next) => {
         return next();
       } catch (firebaseError) {
         console.warn("Firebase token verification failed:", firebaseError.message);
-      }
-    }
-
-    // Firebase not initialized or verification failed, try decoding token manually
-    try {
-      const parts = token.split('.');
-      if (parts.length === 3) {
-        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-        const userId = payload.user_id || payload.sub || payload.uid;
-        if (userId) {
-          req.user = {
-            id: userId,
-            uid: userId,
-            email: payload.email
-          };
-          console.log("User authenticated from decoded token:", req.user);
-          return next();
+        // If Firebase Admin is not configured, accept the token without verification
+        // This is for development - in production, you should configure Firebase Admin
+        if (!firebaseInitialized || firebaseError.code === 'app/no-app') {
+          console.warn("Firebase Admin not configured. Accepting token without verification (development mode).");
+          // Extract user info from token (basic validation)
+          // In production, you MUST configure Firebase Admin SDK
+          try {
+            // Try to decode the token payload (basic check)
+            const parts = token.split('.');
+            if (parts.length === 3) {
+              const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+              req.user = {
+                id: payload.user_id || payload.sub || payload.uid,
+                uid: payload.user_id || payload.sub || payload.uid,
+                email: payload.email
+              };
+              return next();
+            }
+          } catch (decodeError) {
+            console.error("Token decode error:", decodeError);
+          }
         }
+        // If Firebase verification fails and we can't decode, try JWT fallback
+        console.warn("Trying JWT fallback");
       }
-    } catch (decodeError) {
-      console.error("Token decode failed:", decodeError.message);
+    } else {
+      // Firebase Admin not initialized - try to decode token payload
+      console.log("Firebase Admin not initialized, decoding token payload...");
+      try {
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+          console.log("Decoded token payload:", JSON.stringify(payload, null, 2));
+          const userId = payload.user_id || payload.sub || payload.uid;
+          if (userId) {
+            req.user = {
+              id: userId,
+              uid: userId,
+              email: payload.email
+            };
+            console.log("User authenticated:", req.user);
+            return next();
+          } else {
+            console.error("No user_id found in token payload");
+          }
+        } else {
+          console.error("Invalid token format - expected 3 parts, got:", parts.length);
+        }
+      } catch (decodeError) {
+        console.error("Token decode failed:", decodeError.message);
+        console.error("Token decode stack:", decodeError.stack);
+      }
     }
 
     // Fallback to JWT (for backward compatibility)
@@ -78,12 +100,11 @@ exports.authRequired = async (req, res, next) => {
       const config = require("../config");
       const decoded = jwt.verify(token, config.jwtSecret);
       req.user = decoded;
-      return next();
+      next();
     } catch (jwtError) {
       console.error("JWT verification failed:", jwtError.message);
       return res.status(401).json({ error: "Invalid or expired token" });
     }
-
   } catch (error) {
     console.error("Auth middleware error:", error);
     return res.status(401).json({ error: "Invalid or expired token" });

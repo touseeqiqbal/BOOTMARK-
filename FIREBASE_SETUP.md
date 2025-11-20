@@ -126,3 +126,25 @@ npm install
 - Use environment variables in production
 - Enable Firebase App Check for additional security
 - Set up proper Firebase Security Rules
+
+## Private Links Feature
+
+The **Private Links** feature requires Firebase Authentication to be properly configured. This feature allows form owners to:
+
+- Require clients to sign in before accessing forms
+- Restrict form access to specific email addresses
+- Allow clients to save their progress and continue later
+- Enable clients to view their own submissions
+
+### Setting Up Private Links
+
+1. **Complete Firebase Authentication Setup** (steps above)
+2. **Create Forms with Private Links**:
+   - In Form Builder, go to Settings
+   - Enable "Require sign-in for this form (Private Link)"
+   - Optionally add allowed email addresses
+3. **Share with Clients**:
+   - Clients will be prompted to sign in when accessing the link
+   - They can create accounts or use Google Sign-In
+
+For detailed documentation, see [PRIVATE_LINKS.md](./PRIVATE_LINKS.md)

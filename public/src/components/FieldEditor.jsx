@@ -432,7 +432,7 @@ export default function FieldEditor({ field, onUpdate, onClose }) {
               <label>Products</label>
               <div className="options-list">
                 {(formData.products || []).map((product, idx) => (
-                  <div key={product.id || idx} className="option-item">
+                  <div key={product.id || idx} style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '8px' }}>
                     <input
                       type="text"
                       className="input"
@@ -443,9 +443,9 @@ export default function FieldEditor({ field, onUpdate, onClose }) {
                         updateField('products', newProducts)
                       }}
                       placeholder="Product name"
-                      style={{ marginBottom: '5px' }}
+                      style={{ width: '100%', flex: 'none' }}
                     />
-                    <div style={{ display: 'flex', gap: '5px' }}>
+                    <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
                       <input
                         type="number"
                         className="input"
@@ -458,7 +458,7 @@ export default function FieldEditor({ field, onUpdate, onClose }) {
                         placeholder="Price"
                         step="0.01"
                         min="0"
-                        style={{ flex: 1 }}
+                        style={{ width: '120px', flex: 'none' }}
                       />
                       <button
                         className="btn btn-danger btn-sm"

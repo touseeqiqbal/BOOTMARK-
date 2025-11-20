@@ -14,6 +14,12 @@ import Workflows from './pages/Workflows'
 import AccountSettings from './pages/AccountSettings'
 import Analytics from './pages/Analytics'
 import TeamCollaboration from './pages/TeamCollaboration'
+import Customers from './pages/Customers'
+import CustomerDashboard from './pages/CustomerDashboard'
+import Invoices from './pages/Invoices'
+import ClientSubmissions from './pages/ClientSubmissions'
+import ClientPortal from './pages/ClientPortal'
+import ShareRoute from './components/ShareRoute'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
@@ -32,7 +38,16 @@ function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/share/:shareKey" element={<PublicForm />} />
+      <Route path="/share/:shareKey/fill" element={<PublicForm />} />
+      <Route path="/share/:shareKey" element={<ShareRoute />} />
+      <Route
+        path="/client/submissions/:shareKey"
+        element={
+          <PrivateRoute>
+            <ClientSubmissions />
+          </PrivateRoute>
+        }
+      />
       <Route
         path="/dashboard"
         element={
@@ -102,6 +117,30 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <AccountSettings />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/customers"
+        element={
+          <PrivateRoute>
+            <Customers />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/customer/:customerId/submissions"
+        element={
+          <PrivateRoute>
+            <CustomerDashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/invoices"
+        element={
+          <PrivateRoute>
+            <Invoices />
           </PrivateRoute>
         }
       />

@@ -6,7 +6,7 @@ import {
   Heading, User, MapPin, Phone, Clock, PenTool,
   Image, Shield, Loader, ShoppingCart, Table,
   Gauge, Minus, ChevronDown as Collapse, FileX,
-  CreditCard
+  CreditCard, Wrench
 } from 'lucide-react'
 import '../styles/FieldPalette.css'
 
@@ -41,6 +41,12 @@ const FIELD_CATEGORIES = [
       { type: 'appointment', label: 'Appointment', icon: Calendar },
       { type: 'signature', label: 'Signature', icon: PenTool },
       { type: 'fill-blank', label: 'Fill in the Blank', icon: FileText },
+    ]
+  },
+  {
+    name: 'SERVICES',
+    fields: [
+      { type: 'service-category', label: 'Service Category', icon: Wrench },
     ]
   },
   {
@@ -100,6 +106,7 @@ export default function FieldPalette({ onAddField }) {
   const [expandedCategories, setExpandedCategories] = useState({
     'BASIC': true,
     'WIDGETS': true,
+    'SERVICES': true,
     'PAYMENTS': true,
     'SURVEY ELEMENTS': false,
     'PAGE ELEMENTS': false

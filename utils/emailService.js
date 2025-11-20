@@ -49,7 +49,7 @@ async function sendEmail({ to, subject, html, text }) {
 
   try {
     const info = await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@phoenixformbuilder.com',
+      from: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@bootmark.com',
       to,
       subject,
       html,

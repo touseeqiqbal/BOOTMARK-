@@ -1,4 +1,4 @@
-# Deployment Guide - BOOTMARK Form Builder
+# Deployment Guide - BootMark Landscaping Management
 
 ## Quick Deploy to Vercel
 
@@ -155,6 +155,13 @@ npm start
    - Use strong JWT secrets
    - Enable Firebase App Check
    - Set up proper CORS
+   - For private links, ensure Firebase Authentication is properly configured
+
+5. **Private Links Feature**:
+   - Requires Firebase Authentication to be set up
+   - Clients must have BootMark accounts to access private forms
+   - Consider email verification for production use
+   - See [PRIVATE_LINKS.md](./PRIVATE_LINKS.md) for detailed documentation
 
 ## Support
 

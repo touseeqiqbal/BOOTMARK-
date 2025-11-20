@@ -2,19 +2,22 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../utils/AuthContext'
 import api from '../utils/api'
-import { Plus, FileText, Trash2, ExternalLink, Table, BarChart, Workflow, Settings, TrendingUp, Users } from 'lucide-react'
+import { Plus, FileText, Trash2, ExternalLink, Table, BarChart, Workflow, Settings, TrendingUp, Users, CreditCard } from 'lucide-react'
 import logo from '../assets/logo.svg'
 import '../styles/Dashboard.css'
 
 export default function Dashboard() {
   const [forms, setForms] = useState([])
   const [loading, setLoading] = useState(true)
-  const { user, logout } = useAuth()
+  const { user, logout, loading: authLoading } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchForms()
-  }, [])
+    // Fetch forms when component mounts (PrivateRoute ensures user is authenticated)
+    if (!authLoading) {
+      fetchForms()
+    }
+  }, [authLoading])
 
   const fetchForms = async () => {
     try {
@@ -83,7 +86,8 @@ export default function Dashboard() {
     alert('Share link copied to clipboard!')
   }
 
-  if (loading) {
+  // Show loading while auth is loading or forms are being fetched
+  if (authLoading || loading) {
     return <div className="loading">Loading...</div>
   }
 
@@ -95,7 +99,7 @@ export default function Dashboard() {
             <div className="dashboard-brand">
               <img src={logo} alt="BootMark Logo" className="brand-logo" />
               <div className="brand-text">
-                <h1 className="brand-title">BootMark Form Builder</h1>
+                <h1 className="brand-title">BootMark Landscaping Management</h1>
                 <span className="brand-subtitle">My Forms</span>
               </div>
             </div>
@@ -118,10 +122,26 @@ export default function Dashboard() {
       </header>
 
       <div className="container">
-        <div className="dashboard-actions">
+        <div className="dashboard-actions" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button className="btn btn-primary create-form-btn" onClick={createForm}>
             <Plus size={20} />
             Create New Form
+          </button>
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => navigate('/customers')}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            <Users size={18} />
+            Customers
+          </button>
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => navigate('/invoices')}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            <CreditCard size={18} />
+            Invoices
           </button>
         </div>
 

@@ -89,3 +89,33 @@ The application uses JSON files for data storage (located in `/data`):
 - `submissions.json` - Form submissions
 
 These files are created automatically on first use.
+
+## Private Links Feature
+
+BootMark supports **Private Links** which require clients to sign in before accessing forms. This feature includes:
+
+- **Client Authentication**: Clients must sign in to BootMark to access private forms
+- **Email Restrictions**: Optionally restrict form access to specific email addresses
+- **Save & Continue**: Clients can save their progress and return later
+- **Client Dashboard**: Clients can view their own submissions
+
+### Setting Up Private Links
+
+1. **Create or Edit a Form**
+   - Open the form in the Form Builder
+   - Click the Settings icon
+
+2. **Enable Private Link**
+   - Scroll to "Private Link Settings"
+   - Check "Require sign-in for this form (Private Link)"
+
+3. **Optional: Add Email Restrictions**
+   - Enter allowed client emails (one per line)
+   - Leave empty to allow any signed-in user
+
+4. **Save and Share**
+   - Save your form settings
+   - Share the link with clients
+   - Clients will be prompted to sign in
+
+For detailed documentation, see [PRIVATE_LINKS.md](./PRIVATE_LINKS.md)

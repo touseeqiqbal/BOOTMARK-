@@ -27,8 +27,12 @@
 .builder-header-top-left {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
   flex-wrap: wrap;
+}
+
+.btn-back {
+  flex-shrink: 0;
 }
 
 .builder-header-title-section {
@@ -84,10 +88,18 @@
   .builder-header-top-left {
     width: 100%;
     justify-content: space-between;
+    flex-wrap: nowrap;
   }
   
   .builder-brand {
     width: auto;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .btn-back {
+    margin-right: 10px;
+    flex-shrink: 0;
   }
 }
 

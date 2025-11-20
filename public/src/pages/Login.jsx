@@ -10,7 +10,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login, loginWithGoogle } = useAuth()
+  const { login, loginWithGoogle, user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   
@@ -25,6 +25,33 @@ export default function Login() {
     }
   }, [location])
 
+  // Check if user is already logged in and redirect them (only if on login page)
+  useEffect(() => {
+    // Only redirect if we're actually on the login page
+    if (location.pathname === '/login' && !authLoading && user) {
+      const searchParams = new URLSearchParams(location.search)
+      const redirect = searchParams.get('redirect')
+      const redirectPath = redirect && redirect.startsWith('/') ? redirect : '/dashboard'
+      console.log('[Login] User already logged in on login page, redirecting to:', redirectPath)
+      
+      // Small delay to ensure everything is ready
+      setTimeout(() => {
+        navigate(redirectPath, { replace: true })
+      }, 100)
+    }
+  }, [user, authLoading, location.pathname, location.search, navigate])
+
+  const getRedirectPath = () => {
+    const searchParams = new URLSearchParams(location.search)
+    const redirect = searchParams.get('redirect')
+    console.log('[Login] Redirect path:', redirect || '/dashboard')
+    // Ensure redirect is a valid path
+    if (redirect && redirect.startsWith('/')) {
+      return redirect
+    }
+    return '/dashboard'
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -32,10 +59,20 @@ export default function Login() {
 
     try {
       await login(email, password)
-      navigate('/dashboard')
+      const redirectPath = getRedirectPath()
+      console.log('[Login] Login successful, redirect path:', redirectPath)
+      
+      // Wait a moment for auth state to update, then redirect
+      setTimeout(() => {
+        if (redirectPath && redirectPath.startsWith('/share/')) {
+          console.log('[Login] Redirecting to share link:', redirectPath)
+          navigate(redirectPath)
+        } else {
+          navigate(redirectPath)
+        }
+      }, 200)
     } catch (err) {
       setError(err.message || err.code || 'Login failed. Please check your credentials.')
-    } finally {
       setLoading(false)
     }
   }
@@ -45,10 +82,20 @@ export default function Login() {
     setLoading(true)
     try {
       await loginWithGoogle()
-      navigate('/dashboard')
+      const redirectPath = getRedirectPath()
+      console.log('[Login] Google login successful, redirect path:', redirectPath)
+      
+      // Wait a moment for auth state to update, then redirect
+      setTimeout(() => {
+        if (redirectPath && redirectPath.startsWith('/share/')) {
+          console.log('[Login] Redirecting to share link:', redirectPath)
+          navigate(redirectPath)
+        } else {
+          navigate(redirectPath)
+        }
+      }, 200)
     } catch (err) {
       setError(err.message || 'Google login failed')
-    } finally {
       setLoading(false)
     }
   }
@@ -56,7 +103,7 @@ export default function Login() {
   return (
     <div className="auth-container">
         <div className="auth-card">
-          <h1>BootMark Form Builder</h1>
+          <h1>BootMark Landscaping Management</h1>
         <p className="auth-subtitle">Sign in to your account</p>
         
         {error && <div className="error-message">{error}</div>}
@@ -113,3 +160,4 @@ export default function Login() {
     </div>
   )
 }
+

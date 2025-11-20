@@ -4,7 +4,8 @@ import ImageUpload from './ImageUpload'
 import '../styles/FormSettings.css'
 
 export default function FormSettings({ form, onUpdate, onClose }) {
-  const [settings, setSettings] = useState(form.settings || {
+  // Merge existing settings with defaults to ensure all properties are present
+  const defaultSettings = {
     theme: 'default',
     allowMultipleSubmissions: true,
     showProgressBar: true,
@@ -18,6 +19,9 @@ export default function FormSettings({ form, onUpdate, onClose }) {
     startPageTitle: 'Welcome',
     startPageDescription: '',
     startButtonText: 'Start',
+    // Private link settings
+    isPrivateLink: false,
+    allowedEmails: [],
     // Advanced styling
     fontFamily: 'Inter, sans-serif',
     fontSize: '16px',
@@ -40,11 +44,35 @@ export default function FormSettings({ form, onUpdate, onClose }) {
       ownerEmail: '',
       submitterEmailField: ''
     }
-  })
+  }
 
+  // Merge existing form.settings with defaults, ensuring allowedEmails is always an array
+  const mergedSettings = form.settings ? {
+    ...defaultSettings,
+    ...form.settings,
+    // Ensure allowedEmails is always an array
+    allowedEmails: Array.isArray(form.settings.allowedEmails) 
+      ? form.settings.allowedEmails 
+      : (form.settings.allowedEmails ? [form.settings.allowedEmails] : []),
+    // Ensure emailNotifications object exists
+    emailNotifications: {
+      ...defaultSettings.emailNotifications,
+      ...(form.settings.emailNotifications || {})
+    }
+  } : defaultSettings
+
+  const [settings, setSettings] = useState(mergedSettings)
+
+  // Update parent when settings change
   useEffect(() => {
+    // Merge settings into form object properly
+    console.log('[FormSettings] Settings updated:', {
+      isPrivateLink: settings.isPrivateLink,
+      allowedEmails: settings.allowedEmails,
+      settingsKeys: Object.keys(settings)
+    })
     onUpdate({ settings })
-  }, [settings])
+  }, [settings, onUpdate])
 
   const updateSetting = (key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }))
@@ -408,6 +436,42 @@ export default function FormSettings({ form, onUpdate, onClose }) {
           </div>
 
           <div className="settings-section-divider">
+            <h3>Private Link Settings</h3>
+          </div>
+
+          <div className="form-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={settings.isPrivateLink || false}
+                onChange={(e) => updateSetting('isPrivateLink', e.target.checked)}
+              />
+              <span>Require sign-in for this form (Private Link)</span>
+            </label>
+            <small className="help-text">When enabled, users must sign in to BootMark to access and submit this form. They will only see their own submissions.</small>
+          </div>
+
+          {settings.isPrivateLink && (
+            <div className="form-group">
+              <label>Allowed Client Emails (Optional)</label>
+              <textarea
+                className="input"
+                value={settings.allowedEmails?.join('\n') || ''}
+                onChange={(e) => {
+                  const emails = e.target.value
+                    .split('\n')
+                    .map(email => email.trim())
+                    .filter(email => email.length > 0 && email.includes('@'))
+                  updateSetting('allowedEmails', emails)
+                }}
+                rows={4}
+                placeholder="client1@example.com&#10;client2@example.com&#10;Leave empty to allow any signed-in user"
+              />
+              <small className="help-text">Enter one email per line. Only these emails will be able to access the form. Leave empty to allow any signed-in user.</small>
+            </div>
+          )}
+
+          <div className="settings-section-divider">
             <h3>Email Notifications</h3>
           </div>
 
@@ -495,9 +559,21 @@ export default function FormSettings({ form, onUpdate, onClose }) {
           )}
 
           <div className="settings-actions">
-            <button className="btn btn-primary" onClick={onClose}>
+            <button 
+              className="btn btn-primary" 
+              onClick={() => {
+                // Ensure settings are updated before closing
+                onUpdate({ settings });
+                onClose();
+              }}
+            >
               Save Settings
             </button>
+            {settings.isPrivateLink && (
+              <p style={{ marginTop: '10px', fontSize: '12px', color: '#666', textAlign: 'center' }}>
+                ⚠️ Remember to click "Save" in the form builder for private link settings to take effect
+              </p>
+            )}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
-# BOOTMARK Form Builder
+# BootMark Landscaping Management
 
-A comprehensive form builder application with drag-and-drop functionality. Built with React, Express, and multiple framework support.
+A comprehensive landscaping service management platform with drag-and-drop form builder functionality. Built with React, Express, and multiple framework support.
 
 ## Features
 
@@ -8,7 +8,10 @@ A comprehensive form builder application with drag-and-drop functionality. Built
 - 📝 **Multiple Field Types** - Text, Email, Number, Textarea, Dropdown, Radio, Checkbox, Date, File Upload, Rating
 - 👁️ **Live Preview** - Preview your form before publishing
 - 🔗 **Form Sharing** - Share forms via unique links
+- 🔒 **Private Links** - Require sign-in for form access with client-specific submissions
+- 💾 **Save & Continue Later** - Clients can save drafts and return to complete forms
 - 📊 **Submissions Management** - View and manage form submissions
+- 👤 **Client Dashboard** - Clients can view their own submissions
 - 💾 **Export to CSV** - Download submissions as CSV files
 - 🎨 **Customizable Settings** - Theme options and form settings
 - 🔐 **User Authentication** - Secure login and registration
@@ -121,19 +124,38 @@ The application will serve the built frontend from the `public/dist` directory.
 - `DELETE /api/submissions/:id` - Delete submission
 
 ### Public
-- `GET /api/public/form/:shareKey` - Get public form
+- `GET /api/public/form/:shareKey` - Get public form (requires auth for private links)
 - `POST /api/public/form/:shareKey/submit` - Submit form
+- `POST /api/public/form/:shareKey/draft` - Save draft (private links only)
+- `GET /api/public/form/:shareKey/draft` - Get saved draft (private links only)
+- `DELETE /api/public/form/:shareKey/draft` - Delete draft (private links only)
+- `GET /api/public/form/:shareKey/submissions` - Get client's own submissions (private links only)
 
 ## Usage
+
+### For Form Owners
 
 1. **Register/Login**: Create an account or login to access the dashboard
 2. **Create Form**: Click "Create New Form" to start building
 3. **Add Fields**: Drag fields from the palette or click to add them
 4. **Configure Fields**: Click on a field to edit its properties
-5. **Preview**: Use the preview button to see how your form looks
-6. **Save**: Save your form when done
-7. **Share**: Copy the share link to distribute your form
-8. **View Submissions**: Check submissions from the dashboard or form page
+5. **Configure Settings**: 
+   - Set form theme, colors, and styling
+   - Enable **Private Link** to require client sign-in
+   - Optionally restrict access to specific email addresses
+6. **Preview**: Use the preview button to see how your form looks
+7. **Save**: Save your form when done
+8. **Share**: Copy the share link to distribute your form
+9. **View Submissions**: Check submissions from the dashboard or form page
+
+### For Clients (Private Links)
+
+1. **Access Form**: Click on the private link shared by the form owner
+2. **Sign In**: If not already signed in, you'll be prompted to sign in to BootMark
+3. **Fill Form**: Complete the form fields
+4. **Save Progress**: Use "Save and Continue Later" to save your progress
+5. **Submit**: Submit the completed form
+6. **View Submissions**: Click "My Submissions" to view all your submissions for this form
 
 ## Field Types
 

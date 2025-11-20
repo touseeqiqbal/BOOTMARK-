@@ -1,7 +1,7 @@
 {
-  "name": "workspace",
+  "name": "bootmark-landscaping-management",
   "version": "1.0.0",
-  "description": "",
+  "description": "BootMark Landscaping Management - Comprehensive landscaping service management platform",
   "main": "server.js",
   "scripts": {
     "dev": "node server.js",

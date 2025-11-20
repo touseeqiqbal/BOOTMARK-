@@ -392,6 +392,8 @@ router.get("/account", async (req, res) => {
       companyName: user.companyName || '',
       accountType: user.accountType || 'personal',
       accountStatus: user.accountStatus || 'active',
+      isAdmin: user.isAdmin === true,
+      role: user.role || 'user',
       notifications: user.notifications || {},
       businessInfo: user.businessInfo || {}
     });

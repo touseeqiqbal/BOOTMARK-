@@ -165,6 +165,48 @@ The integration requests these scopes:
 - `POST /api/quickbooks/disconnect` - Disconnect QuickBooks
 - `POST /api/quickbooks/sync` - Sync form submissions to QuickBooks
 
+## Private Links Feature
+
+The **Private Links** feature allows form owners to require client authentication before accessing forms. This integrates with Firebase Authentication.
+
+### Key Features
+
+- **Client Authentication**: Clients must sign in to BootMark to access private forms
+- **Email Restrictions**: Optionally restrict access to specific email addresses
+- **Save & Continue**: Clients can save their progress and return later
+- **Client Dashboard**: Clients can view their own submissions
+
+### Setup Requirements
+
+1. **Firebase Authentication** must be configured (see [FIREBASE_SETUP.md](./FIREBASE_SETUP.md))
+2. **Email/Password** provider must be enabled
+3. **Google Sign-In** (optional but recommended) can be enabled
+
+### Using Private Links
+
+1. **Enable in Form Settings**:
+   - Open form in Form Builder
+   - Go to Settings → Private Link Settings
+   - Check "Require sign-in for this form (Private Link)"
+   - Optionally add allowed email addresses
+
+2. **Client Experience**:
+   - Clients click the private link
+   - They're prompted to sign in (or create account)
+   - After sign-in, they can fill out and submit the form
+   - They can save progress and view their submissions
+
+### API Endpoints
+
+- `GET /api/public/form/:shareKey` - Get form (checks authentication for private links)
+- `POST /api/public/form/:shareKey/submit` - Submit form (requires auth for private links)
+- `POST /api/public/form/:shareKey/draft` - Save draft
+- `GET /api/public/form/:shareKey/draft` - Get saved draft
+- `GET /api/public/form/:shareKey/submissions` - Get client's own submissions
+- `DELETE /api/public/form/:shareKey/draft` - Delete draft
+
+For detailed documentation, see [PRIVATE_LINKS.md](./PRIVATE_LINKS.md)
+
 ### Support
 
 For issues:
@@ -172,3 +214,4 @@ For issues:
 - Verify all environment variables are set correctly
 - Test SMTP configuration with "Send Test Email"
 - Check QuickBooks Developer Dashboard for OAuth errors
+- For private links, ensure Firebase Authentication is properly configured

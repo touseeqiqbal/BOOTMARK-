@@ -44,6 +44,17 @@ Once both servers are running:
 1. Open http://localhost:3000 in your browser
 2. Click "Sign up" to create a new account
 3. Create your first form!
+4. **Optional**: Enable Private Links in form settings to require client authentication
+
+## 🔒 Private Links Feature
+
+BootMark supports **Private Links** which require clients to sign in before accessing forms:
+
+- **For Form Owners**: Enable "Private Link" in form settings
+- **For Clients**: Sign in when accessing private form links
+- **Features**: Save progress, view own submissions, email restrictions
+
+See [PRIVATE_LINKS.md](./PRIVATE_LINKS.md) for detailed documentation.
 
 ## 🛠️ Troubleshooting
 

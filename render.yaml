@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: bootmark-form-builder
+    name: bootmark-landscaping-management
     env: node
     plan: starter
     buildCommand: npm install && cd public && npm install && npm run build

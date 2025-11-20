@@ -53,7 +53,49 @@ async function getForms() {
   try {
     await initFormsFile();
     const data = await fs.readFile(FORMS_FILE, "utf8");
-    const forms = JSON.parse(data);
+    
+    // Try to parse JSON
+    let forms;
+    try {
+      forms = JSON.parse(data);
+    } catch (parseError) {
+      console.error("JSON parse error in forms file:", parseError.message);
+      console.error("Error position:", parseError.message.match(/position (\d+)/)?.[1] || 'unknown');
+      
+      // Try to recover by fixing common issues
+      let cleanedData = data.trim();
+      
+      // Remove trailing extra brackets
+      cleanedData = cleanedData.replace(/\]+\s*$/, ']');
+      
+      // Remove trailing commas before closing brackets
+      cleanedData = cleanedData.replace(/,(\s*[}\]])/g, '$1');
+      
+      // Try parsing again
+      try {
+        forms = JSON.parse(cleanedData);
+        console.log("Successfully recovered forms file after cleaning");
+        
+        // Save the cleaned version back
+        await saveForms(forms);
+        console.log("Saved cleaned forms file");
+      } catch (recoverError) {
+        console.error("Could not recover forms file:", recoverError.message);
+        // Create backup of corrupted file
+        try {
+          const backupPath = FORMS_FILE + '.backup.' + Date.now();
+          await fs.writeFile(backupPath, data, 'utf8');
+          console.log("Created backup of corrupted file:", backupPath);
+        } catch (backupError) {
+          console.error("Failed to create backup:", backupError.message);
+        }
+        
+        // Return empty array and let the system recreate the file
+        console.log("Returning empty array - file will be recreated on next save");
+        return [];
+      }
+    }
+    
     console.log(`Read ${forms.length} forms from ${FORMS_FILE}`);
     return Array.isArray(forms) ? forms : [];
   } catch (error) {
@@ -308,9 +350,17 @@ router.put("/:id", async (req, res) => {
       const userId = req.user.uid || req.user.id;
       if (existing.userId !== userId) return res.status(403).json({ error: "Access denied" });
 
+      // Merge settings properly to preserve all settings properties
+      const mergedSettings = {
+        ...(existing.settings || {}),
+        ...(req.body.settings || {})
+      };
+      
       const updatedForm = {
         ...existing,
         ...req.body,
+        // Ensure settings are properly merged
+        settings: Object.keys(mergedSettings).length > 0 ? mergedSettings : existing.settings,
         id: existing.id,
         userId: existing.userId,
         shareKey: existing.shareKey,
@@ -334,9 +384,17 @@ router.put("/:id", async (req, res) => {
       return res.status(403).json({ error: "Access denied" });
     }
 
+    // Merge settings properly to preserve all settings properties
+    const mergedSettings = {
+      ...(forms[formIndex].settings || {}),
+      ...(req.body.settings || {})
+    };
+    
     const updatedForm = {
       ...forms[formIndex],
       ...req.body,
+      // Ensure settings are properly merged
+      settings: Object.keys(mergedSettings).length > 0 ? mergedSettings : forms[formIndex].settings,
       id: forms[formIndex].id,
       userId: forms[formIndex].userId,
       shareKey: forms[formIndex].shareKey,

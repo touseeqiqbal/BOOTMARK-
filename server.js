@@ -20,6 +20,8 @@ const authRouter = require("./routes/auth");
 const packagesRouter = require("./routes/packages");
 const submissionsRouter = require("./routes/submissions");
 const quickbooksRouter = require("./routes/quickbooks");
+const { router: customersRouter } = require("./routes/customers");
+const invoicesRouter = require("./routes/invoices");
 const { authRequired } = require("./middleware/auth");
 
 const app = express();
@@ -89,6 +91,8 @@ app.use("/api/packages", packagesRouter);
 app.use("/api/forms", authRequired, formsRouter);
 app.use("/api/workspaces", authRequired, workspacesRouter);
 app.use("/api/submissions", authRequired, submissionsRouter);
+app.use("/api/customers", authRequired, customersRouter);
+app.use("/api/invoices", authRequired, invoicesRouter);
 app.use("/api/quickbooks", quickbooksRouter);
 app.use("/api/public", publicRouter);
 

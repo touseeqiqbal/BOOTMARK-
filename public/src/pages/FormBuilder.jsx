@@ -54,17 +54,43 @@ export default function FormBuilder() {
   const saveForm = async () => {
     setSaving(true)
     try {
-      const response = await api.put(`/forms/${id}`, {
+      // Ensure settings object exists and is properly structured
+      const formToSave = {
         ...form,
         fields,
         pages,
-        title: form.title
+        title: form.title,
+        settings: form.settings || {}
+      }
+      
+      // Log settings to debug - especially private link settings
+      console.log('[FormBuilder] Saving form with settings:', {
+        hasSettings: !!formToSave.settings,
+        isPrivateLink: formToSave.settings.isPrivateLink,
+        allowedEmails: formToSave.settings.allowedEmails,
+        allSettingsKeys: Object.keys(formToSave.settings || {})
       })
+      console.log('[FormBuilder] Full settings object:', JSON.stringify(formToSave.settings, null, 2))
+      
+      const response = await api.put(`/forms/${id}`, formToSave)
+      
+      // Verify settings were saved correctly
+      console.log('[FormBuilder] Form saved. Response settings:', {
+        isPrivateLink: response.data.settings?.isPrivateLink,
+        allowedEmails: response.data.settings?.allowedEmails
+      })
+      
       setForm(response.data)
       alert('Form saved successfully!')
+      
+      // If private link is enabled, remind user
+      if (response.data.settings?.isPrivateLink) {
+        console.log('[FormBuilder] Private link enabled - form will require authentication')
+      }
     } catch (error) {
-      console.error('Failed to save form:', error)
-      alert('Failed to save form')
+      console.error('[FormBuilder] Failed to save form:', error)
+      console.error('[FormBuilder] Error response:', error.response?.data)
+      alert('Failed to save form: ' + (error.response?.data?.error || error.message))
     } finally {
       setSaving(false)
     }
@@ -448,6 +474,8 @@ export default function FormBuilder() {
       'appointment': 'Appointment',
       'signature': 'Signature',
       'fill-blank': 'Fill in the Blank',
+      // Services
+      'service-category': 'Service Category',
       // Payments
       'product-list': 'Product List',
       // Survey
@@ -572,14 +600,14 @@ export default function FormBuilder() {
       <header className="builder-header">
         <div className="builder-header-top">
           <div className="builder-header-top-left">
-            <div className="builder-brand">
-              <img src={logo} alt="BootMark Logo" className="brand-logo" />
-              <h1 className="brand-title">BootMark Form Builder</h1>
-            </div>
-            <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
+            <button className="btn btn-secondary btn-back" onClick={() => navigate('/dashboard')}>
               <ArrowLeft size={18} />
               Back
             </button>
+            <div className="builder-brand">
+              <img src={logo} alt="BootMark Logo" className="brand-logo" />
+              <h1 className="brand-title">BootMark Landscaping Management</h1>
+            </div>
           </div>
           <div className="builder-actions">
             {form?.shareKey && (
@@ -717,7 +745,31 @@ export default function FormBuilder() {
       {showSettings && (
         <FormSettings
           form={{ ...form, fields }}
-          onUpdate={(updates) => setForm({ ...form, ...updates })}
+          onUpdate={(updates) => {
+            console.log('[FormBuilder] Settings update received:', {
+              hasSettings: !!updates.settings,
+              isPrivateLink: updates.settings?.isPrivateLink,
+              allowedEmails: updates.settings?.allowedEmails,
+              allKeys: updates.settings ? Object.keys(updates.settings) : []
+            });
+            // Ensure settings are properly merged
+            if (updates.settings) {
+              const mergedSettings = {
+                ...(form.settings || {}),
+                ...updates.settings
+              };
+              console.log('[FormBuilder] Merged settings:', {
+                isPrivateLink: mergedSettings.isPrivateLink,
+                allowedEmails: mergedSettings.allowedEmails
+              });
+              setForm(prevForm => ({
+                ...prevForm,
+                settings: mergedSettings
+              }));
+            } else {
+              setForm({ ...form, ...updates });
+            }
+          }}
           onClose={() => setShowSettings(false)}
         />
       )}

@@ -30,7 +30,7 @@ export default function ForgotPassword() {
   return (
     <div className="auth-container">
         <div className="auth-card">
-          <h1>BootMark Form Builder</h1>
+          <h1>BootMark Landscaping Management</h1>
         <p className="auth-subtitle">Reset your password</p>
         
         {error && <div className="error-message">{error}</div>}

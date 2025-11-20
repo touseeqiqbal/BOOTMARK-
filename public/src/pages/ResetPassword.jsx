@@ -79,7 +79,7 @@ export default function ResetPassword() {
   return (
     <div className="auth-container">
         <div className="auth-card">
-          <h1>BootMark Form Builder</h1>
+          <h1>BootMark Landscaping Management</h1>
         <p className="auth-subtitle">Set new password</p>
         
         {error && (

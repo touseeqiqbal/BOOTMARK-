@@ -1,4 +1,4 @@
-# Vercel Deployment Guide for BOOTMARK Form Builder
+# Vercel Deployment Guide for BootMark Landscaping Management
 
 ## Deployment Options
 
@@ -67,7 +67,7 @@ FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}
    - Set up and deploy? **Yes**
    - Which scope? **Your account**
    - Link to existing project? **No**
-   - Project name? **phoenix-form-builder** (or your choice)
+   - Project name? **bootmark-landscaping-management** (or your choice)
    - Directory? **./** (current directory)
    - Override settings? **No**
 

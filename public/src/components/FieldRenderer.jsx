@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ServiceCategorySelector from './ServiceCategorySelector'
 import '../styles/FieldRenderer.css'
 
 export default function FieldRenderer({ field, value, onChange, disabled }) {
@@ -420,7 +421,8 @@ export default function FieldRenderer({ field, value, onChange, disabled }) {
             disabled={disabled}
             required={field.required}
             className="field-input"
-            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+            pattern="[\d\s\-\(\)\+\.]{7,20}"
+            title="Enter a valid phone number (at least 7 digits)"
           />
         )
 
@@ -693,6 +695,16 @@ export default function FieldRenderer({ field, value, onChange, disabled }) {
             <div className="spinner"></div>
             <span>{field.label || 'Loading...'}</span>
           </div>
+        )
+
+      case 'service-category':
+        return (
+          <ServiceCategorySelector
+            field={field}
+            value={value}
+            onChange={onChange}
+            disabled={disabled}
+          />
         )
 
       default:

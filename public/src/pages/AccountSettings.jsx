@@ -18,7 +18,9 @@ export default function AccountSettings() {
     email: user?.email || '',
     companyName: '',
     accountType: 'personal', // personal or business
-    accountStatus: 'active'
+    accountStatus: 'active',
+    isAdmin: false,
+    role: 'user'
   })
 
   // Account Security
@@ -110,7 +112,9 @@ export default function AccountSettings() {
           email: data.email || user?.email || '',
           companyName: data.companyName || '',
           accountType: data.accountType || 'personal',
-          accountStatus: data.accountStatus || 'active'
+          accountStatus: data.accountStatus || 'active',
+          isAdmin: data.isAdmin === true,
+          role: data.role || 'user'
         }))
         setNotifications(data.notifications || notifications)
         setBusinessInfo(data.businessInfo || businessInfo)
@@ -381,7 +385,7 @@ export default function AccountSettings() {
                 className="input"
                 value={personalInfo.name}
                 onChange={(e) => setPersonalInfo(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Your full name"
+                placeholder="John Doe"
               />
             </div>
             <div className="form-group">
@@ -422,6 +426,27 @@ export default function AccountSettings() {
                   {personalInfo.accountStatus.charAt(0).toUpperCase() + personalInfo.accountStatus.slice(1)}
                 </span>
               </div>
+            </div>
+            <div className="form-group">
+              <label>Admin Status</label>
+              <div className="status-badge">
+                {personalInfo.isAdmin ? (
+                  <span className="status active" style={{ backgroundColor: '#10b981', color: 'white' }}>
+                    <CheckCircle size={16} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                    Admin User
+                  </span>
+                ) : (
+                  <span className="status" style={{ backgroundColor: '#6b7280', color: 'white' }}>
+                    <XCircle size={16} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                    Regular User
+                  </span>
+                )}
+              </div>
+              <small style={{ color: '#6b7280', marginTop: '4px', display: 'block' }}>
+                {personalInfo.isAdmin 
+                  ? 'You have admin privileges. You can edit service rates in forms.' 
+                  : 'To become an admin, add "isAdmin": true to your user record in the database.'}
+              </small>
             </div>
             <button className="btn btn-primary" onClick={handlePersonalInfoUpdate} disabled={saving}>
               <Save size={18} />
@@ -576,7 +601,7 @@ export default function AccountSettings() {
             <Building size={24} />
             <div>
               <h2>Personal & Business Info</h2>
-              <p>Help maintain a safe and trustworthy form builder.</p>
+              <p>Help maintain a safe and trustworthy landscaping management platform.</p>
             </div>
           </div>
           <div className="section-content">

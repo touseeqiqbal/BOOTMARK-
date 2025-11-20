@@ -44,7 +44,7 @@ export default function Register() {
   return (
     <div className="auth-container">
         <div className="auth-card">
-          <h1>BootMark Form Builder</h1>
+          <h1>BootMark Landscaping Management</h1>
         <p className="auth-subtitle">Create your account</p>
         
         {error && <div className="error-message">{error}</div>}

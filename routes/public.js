@@ -3,7 +3,8 @@ const fs = require("fs").promises;
 const path = require("path");
 const { sendSubmissionNotification } = require(path.join(__dirname, "..", "utils", "emailService"));
 const { getDataFilePath } = require(path.join(__dirname, "..", "utils", "dataPath"));
-const { useFirestore, getCollectionRef, getDoc, setDoc } = require(path.join(__dirname, "..", "utils", "db"));
+const { useFirestore, getCollectionRef, getDoc, setDoc, deleteDoc } = require(path.join(__dirname, "..", "utils", "db"));
+const { extractCustomerInfo, getCustomers, saveCustomers } = require("./customers");
 
 const router = express.Router();
 
@@ -108,6 +109,59 @@ async function saveForms(forms) {
   await fs.writeFile(FORMS_FILE, JSON.stringify(forms, null, 2), 'utf8');
 }
 
+// Helper function to verify client token and extract user info
+async function verifyClientToken(req) {
+  const authHeader = req.headers?.authorization;
+  const token = req.cookies?.token || (authHeader && authHeader.startsWith('Bearer ') ? authHeader.replace("Bearer ", "") : null);
+  
+  console.log('[verifyClientToken] Token present:', !!token, 'Auth header:', !!authHeader);
+  
+  if (!token) {
+    console.log('[verifyClientToken] No token found in request');
+    return null;
+  }
+
+  try {
+    const { admin } = require("../utils/db");
+    if (admin && admin.apps && admin.apps.length > 0) {
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        console.log('[verifyClientToken] Token verified with Firebase Admin:', decodedToken.email);
+        return {
+          uid: decodedToken.uid,
+          email: decodedToken.email
+        };
+      } catch (firebaseError) {
+        console.log('[verifyClientToken] Firebase token verification failed:', firebaseError.message);
+        // Fall through to JWT decode
+      }
+    }
+    
+    // Fallback: decode JWT manually (for development or when Firebase Admin not available)
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+        const uid = payload.user_id || payload.sub || payload.uid || payload.id;
+        if (uid) {
+          console.log('[verifyClientToken] Token decoded manually, uid:', uid, 'email:', payload.email);
+          return {
+            uid: uid,
+            email: payload.email
+          };
+        }
+      }
+    } catch (decodeError) {
+      console.log('[verifyClientToken] JWT decode failed:', decodeError.message);
+    }
+  } catch (error) {
+    console.error("[verifyClientToken] Token verification error:", error);
+  }
+  
+  console.log('[verifyClientToken] No valid token found, returning null');
+  return null;
+}
+
 // Get public form by share key
 router.get("/form/:shareKey", async (req, res) => {
   try {
@@ -122,6 +176,71 @@ router.get("/form/:shareKey", async (req, res) => {
 
     if (!form) {
       return res.status(404).json({ error: "Form not found" });
+    }
+
+    // Check if form requires authentication (private link) FIRST - before any other processing
+    // Use explicit check to handle undefined/null/empty string/false cases
+    const hasPrivateLinkSetting = form.settings && form.settings.hasOwnProperty('isPrivateLink');
+    const isPrivateLink = hasPrivateLinkSetting && 
+                         (form.settings.isPrivateLink === true || 
+                          form.settings.isPrivateLink === 'true');
+    
+    console.log('[Public Form Check] Form:', form.id, 'ShareKey:', form.shareKey);
+    console.log('[Public Form Check] Has settings:', !!form.settings);
+    console.log('[Public Form Check] Settings keys:', form.settings ? Object.keys(form.settings) : 'none');
+    console.log('[Public Form Check] Has isPrivateLink property:', hasPrivateLinkSetting);
+    console.log('[Public Form Check] isPrivateLink value:', form.settings?.isPrivateLink, 'type:', typeof form.settings?.isPrivateLink);
+    console.log('[Public Form Check] isPrivateLink check result:', isPrivateLink);
+    
+    // CRITICAL: Double-check with direct property access
+    if (form.settings) {
+      const directCheck = form.settings.isPrivateLink;
+      console.log('[Public Form Check] Direct isPrivateLink access:', directCheck, 'type:', typeof directCheck);
+    }
+    
+    // CRITICAL: Check authentication BEFORE processing anything else for private links
+    if (isPrivateLink) {
+      console.log(`[Private Link Check] Form ${form.id} (${form.shareKey}) requires authentication - checking now`);
+      
+      // Verify authentication FIRST
+      const clientUser = await verifyClientToken(req);
+      
+      if (!clientUser || !clientUser.uid) {
+        console.log(`[Private Link Check] AUTHENTICATION FAILED - returning 401 immediately`);
+        console.log(`[Private Link Check] Token present:`, !!req.headers?.authorization);
+        console.log(`[Private Link Check] Cookie token present:`, !!req.cookies?.token);
+        
+        // Return 401 IMMEDIATELY - don't return form data
+        return res.status(401).json({ 
+          error: "Authentication required",
+          requiresAuth: true,
+          isPrivateLink: true,
+          message: "This form requires you to sign in to BootMark"
+        });
+      }
+
+      console.log(`[Private Link Check] User authenticated: ${clientUser.email} (${clientUser.uid})`);
+
+      // Check if email is in allowed list (if provided)
+      const allowedEmails = form.settings.allowedEmails;
+      if (allowedEmails && Array.isArray(allowedEmails) && allowedEmails.length > 0) {
+        const normalizedAllowed = allowedEmails
+          .filter(e => e && typeof e === 'string')
+          .map(e => e.toLowerCase().trim())
+          .filter(e => e.length > 0 && e.includes('@'));
+        
+        if (normalizedAllowed.length > 0) {
+          const clientEmail = clientUser.email?.toLowerCase().trim();
+          if (!clientEmail || !normalizedAllowed.includes(clientEmail)) {
+            console.log(`[Private Link Check] Access denied - email ${clientEmail} not in allowed list:`, normalizedAllowed);
+            return res.status(403).json({ 
+              error: "Access denied",
+              message: "Your email is not authorized to access this form"
+            });
+          }
+          console.log(`[Private Link Check] Email ${clientEmail} is authorized`);
+        }
+      }
     }
 
     // Increment view count
@@ -144,18 +263,115 @@ router.get("/form/:shareKey", async (req, res) => {
     }
 
     // Return form without sensitive data
+    // CRITICAL: Only return form data if authentication check passed (or form is public)
+    // Ensure settings object exists and includes isPrivateLink
     const publicForm = {
       id: form.id,
       title: form.title,
-      fields: form.fields,
-      settings: form.settings,
+      fields: form.fields || [],
+      settings: form.settings || {},
       pages: form.pages || [{ id: '1', name: 'Page 1', order: 0 }],
     };
+    
+    // Log what we're about to return
+    console.log('[Public Form Response] Returning form:', {
+      id: publicForm.id,
+      shareKey: form.shareKey,
+      isPrivateLink: publicForm.settings?.isPrivateLink,
+      settingsExist: !!publicForm.settings
+    });
+
+    // Debug logging for private links (after auth check, so this logs for all requests)
+    const publicFormIsPrivate = publicForm.settings && 
+                                publicForm.settings.hasOwnProperty('isPrivateLink') &&
+                                (publicForm.settings.isPrivateLink === true || 
+                                 publicForm.settings.isPrivateLink === 'true');
+    if (publicFormIsPrivate) {
+      console.log(`[Private Link Response] Form ${form.id} (${form.shareKey}) is private`);
+      console.log(`[Private Link Response] Allowed emails:`, publicForm.settings.allowedEmails || 'none');
+      const clientUser = await verifyClientToken(req);
+      console.log(`[Private Link Response] Client authenticated:`, !!clientUser);
+      if (clientUser) {
+        console.log(`[Private Link Response] Client email:`, clientUser.email);
+      }
+    }
 
     res.json(publicForm);
   } catch (error) {
     console.error("Get public form error:", error);
     res.status(500).json({ error: "Failed to fetch form" });
+  }
+});
+
+// Save draft (for save and continue later)
+router.post("/form/:shareKey/draft", async (req, res) => {
+  try {
+    // Resolve the form by shareKey
+    let form
+    if (useFirestore) {
+      const snap = await getCollectionRef('forms').where('shareKey', '==', req.params.shareKey).limit(1).get()
+      snap.forEach(d => { form = { id: d.id, ...d.data() } })
+    } else {
+      const forms = await getForms();
+      form = forms.find((f) => f.shareKey === req.params.shareKey);
+    }
+
+    if (!form) {
+      return res.status(404).json({ error: "Form not found" });
+    }
+
+    // Check if form requires authentication (private link)
+    let clientUser = null;
+    if (form.settings?.isPrivateLink) {
+      clientUser = await verifyClientToken(req);
+      if (!clientUser || !clientUser.uid) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+    }
+
+    const { data: draftData } = req.body;
+
+    const draftSubmission = {
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      formId: form.id,
+      data: draftData,
+      isDraft: true,
+      savedAt: new Date().toISOString(),
+      submittedBy: clientUser?.uid || null,
+      ipAddress: req.ip,
+    };
+
+    if (useFirestore) {
+      try {
+        await setDoc('submissions', draftSubmission.id, draftSubmission)
+      } catch (e) {
+        console.error('Failed saving draft to Firestore:', e)
+        return res.status(500).json({ error: 'Failed to save draft' })
+      }
+    } else {
+      const submissions = await getSubmissions();
+      // Remove existing draft for this form and user if exists
+      const existingDraftIndex = submissions.findIndex(
+        s => s.formId === form.id && 
+             s.isDraft === true && 
+             s.submittedBy === (clientUser?.uid || null)
+      );
+      if (existingDraftIndex !== -1) {
+        submissions[existingDraftIndex] = draftSubmission;
+      } else {
+        submissions.push(draftSubmission);
+      }
+      await saveSubmissions(submissions);
+    }
+
+    res.json({
+      success: true,
+      message: "Draft saved successfully",
+      draftId: draftSubmission.id
+    });
+  } catch (error) {
+    console.error("Save draft error:", error);
+    res.status(500).json({ error: "Failed to save draft" });
   }
 });
 
@@ -176,25 +392,112 @@ router.post("/form/:shareKey/submit", async (req, res) => {
       return res.status(404).json({ error: "Form not found" });
     }
 
-    const { data: submissionData } = req.body;
+    // Check if form requires authentication (private link)
+    let clientUser = null;
+    if (form.settings?.isPrivateLink) {
+      clientUser = await verifyClientToken(req);
+      if (!clientUser || !clientUser.uid) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+    }
+
+    const { data: submissionData, draftId } = req.body;
 
     const newSubmission = {
-      id: Date.now().toString(),
+      id: draftId || Date.now().toString(),
       formId: form.id,
       data: submissionData,
       submittedAt: new Date().toISOString(),
+      submittedBy: clientUser?.uid || null,
+      isDraft: false,
       ipAddress: req.ip,
     };
+
+    // Extract customer info and create/update customer
+    try {
+      const { customerName, customerEmail, customerPhone } = extractCustomerInfo(form, submissionData);
+      
+      if (customerName || customerEmail) {
+        const customers = await getCustomers();
+        const userId = form.userId;
+        
+        // Find existing customer by email or name
+        let customer = customers.find((c) => 
+          c.userId === userId && (
+            (customerEmail && c.email && c.email.toLowerCase() === customerEmail.toLowerCase()) ||
+            (customerName && c.name && c.name.toLowerCase() === customerName.toLowerCase())
+          )
+        );
+
+        if (customer) {
+          // Update existing customer
+          customer.name = customerName || customer.name;
+          customer.email = customerEmail || customer.email;
+          customer.phone = customerPhone || customer.phone;
+          customer.updatedAt = new Date().toISOString();
+          customer.lastSubmissionAt = new Date().toISOString();
+        } else {
+          // Create new customer
+          customer = {
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+            userId: userId,
+            name: customerName || 'Unknown Customer',
+            email: customerEmail || null,
+            phone: customerPhone || null,
+            address: null,
+            notes: null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            lastSubmissionAt: new Date().toISOString(),
+            submissionCount: 0
+          };
+          customers.push(customer);
+        }
+
+        // Update submission count
+        customer.submissionCount = (customer.submissionCount || 0) + 1;
+        
+        // Link submission to customer
+        newSubmission.customerId = customer.id;
+
+        // Save customers
+        await saveCustomers(customers);
+      }
+    } catch (customerError) {
+      console.error("Error creating/updating customer:", customerError);
+      // Don't fail the submission if customer creation fails
+    }
+
     if (useFirestore) {
       try {
-        await setDoc('submissions', newSubmission.id, newSubmission)
+        // If it was a draft, update it; otherwise create new
+        if (draftId) {
+          const existing = await getDoc('submissions', draftId);
+          if (existing && existing.isDraft) {
+            await setDoc('submissions', draftId, newSubmission);
+          } else {
+            await setDoc('submissions', newSubmission.id, newSubmission);
+          }
+        } else {
+          await setDoc('submissions', newSubmission.id, newSubmission);
+        }
       } catch (e) {
         console.error('Failed saving submission to Firestore:', e)
         return res.status(500).json({ error: 'Failed to submit form' })
       }
     } else {
       const submissions = await getSubmissions();
-      submissions.push(newSubmission);
+      // If it was a draft, update it; otherwise add new
+      if (draftId) {
+        const draftIndex = submissions.findIndex(s => s.id === draftId && s.isDraft);
+        if (draftIndex !== -1) {
+          submissions[draftIndex] = newSubmission;
+        } else {
+          submissions.push(newSubmission);
+        }
+      } else {
+        submissions.push(newSubmission);
+      }
       await saveSubmissions(submissions);
     }
 
@@ -230,6 +533,151 @@ router.post("/form/:shareKey/submit", async (req, res) => {
   } catch (error) {
     console.error("Submit form error:", error);
     res.status(500).json({ error: "Failed to submit form" });
+  }
+});
+
+// Get client's own submissions for a form (for private links)
+router.get("/form/:shareKey/submissions", async (req, res) => {
+  try {
+    // Verify authentication
+    const clientUser = await verifyClientToken(req);
+    if (!clientUser || !clientUser.uid) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Get form
+    let form
+    if (useFirestore) {
+      const snap = await getCollectionRef('forms').where('shareKey', '==', req.params.shareKey).limit(1).get()
+      snap.forEach(d => { form = { id: d.id, ...d.data() } })
+    } else {
+      const forms = await getForms();
+      form = forms.find((f) => f.shareKey === req.params.shareKey);
+    }
+
+    if (!form) {
+      return res.status(404).json({ error: "Form not found" });
+    }
+
+    // Check if form is private link
+    if (!form.settings?.isPrivateLink) {
+      return res.status(403).json({ error: "This endpoint is only for private links" });
+    }
+
+    // Get client's submissions for this form
+    const submissions = await getSubmissions();
+    const clientSubmissions = submissions.filter(
+      s => s.formId === form.id && 
+           s.submittedBy === clientUser.uid &&
+           s.isDraft !== true // Exclude drafts from submissions list (or include them, depending on requirement)
+    );
+
+    // Attach form title
+    const submissionsWithForm = clientSubmissions.map(submission => ({
+      ...submission,
+      formTitle: form.title
+    }));
+
+    res.json(submissionsWithForm);
+  } catch (error) {
+    console.error("Get client submissions error:", error);
+    res.status(500).json({ error: "Failed to fetch submissions" });
+  }
+});
+
+// Get client's draft for a form
+router.get("/form/:shareKey/draft", async (req, res) => {
+  try {
+    // Verify authentication
+    const clientUser = await verifyClientToken(req);
+    if (!clientUser || !clientUser.uid) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Get form
+    let form
+    if (useFirestore) {
+      const snap = await getCollectionRef('forms').where('shareKey', '==', req.params.shareKey).limit(1).get()
+      snap.forEach(d => { form = { id: d.id, ...d.data() } })
+    } else {
+      const forms = await getForms();
+      form = forms.find((f) => f.shareKey === req.params.shareKey);
+    }
+
+    if (!form) {
+      return res.status(404).json({ error: "Form not found" });
+    }
+
+    // Get client's draft for this form
+    const submissions = await getSubmissions();
+    const draft = submissions.find(
+      s => s.formId === form.id && 
+           s.submittedBy === clientUser.uid &&
+           s.isDraft === true
+    );
+
+    if (!draft) {
+      return res.status(404).json({ error: "No draft found" });
+    }
+
+    res.json(draft);
+  } catch (error) {
+    console.error("Get draft error:", error);
+    res.status(500).json({ error: "Failed to fetch draft" });
+  }
+});
+
+// Delete draft
+router.delete("/form/:shareKey/draft", async (req, res) => {
+  try {
+    // Verify authentication
+    const clientUser = await verifyClientToken(req);
+    if (!clientUser || !clientUser.uid) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Get form
+    let form
+    if (useFirestore) {
+      const snap = await getCollectionRef('forms').where('shareKey', '==', req.params.shareKey).limit(1).get()
+      snap.forEach(d => { form = { id: d.id, ...d.data() } })
+    } else {
+      const forms = await getForms();
+      form = forms.find((f) => f.shareKey === req.params.shareKey);
+    }
+
+    if (!form) {
+      return res.status(404).json({ error: "Form not found" });
+    }
+
+    // Get and delete client's draft
+    const submissions = await getSubmissions();
+    const draftIndex = submissions.findIndex(
+      s => s.formId === form.id && 
+           s.submittedBy === clientUser.uid &&
+           s.isDraft === true
+    );
+
+    if (draftIndex === -1) {
+      return res.status(404).json({ error: "No draft found" });
+    }
+
+    if (useFirestore) {
+      try {
+        await deleteDoc('submissions', submissions[draftIndex].id);
+      } catch (e) {
+        console.error('Failed deleting draft from Firestore:', e);
+        return res.status(500).json({ error: 'Failed to delete draft' });
+      }
+    } else {
+      submissions.splice(draftIndex, 1);
+      await saveSubmissions(submissions);
+    }
+
+    res.json({ success: true, message: "Draft deleted successfully" });
+  } catch (error) {
+    console.error("Delete draft error:", error);
+    res.status(500).json({ error: "Failed to delete draft" });
   }
 });
 

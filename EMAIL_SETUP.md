@@ -1,4 +1,4 @@
-# Email Configuration Guide - BOOTMARK Form Builder
+# Email Configuration Guide - BootMark Landscaping Management
 
 This guide will help you set up email notifications for form submissions.
 
@@ -26,7 +26,7 @@ SMTP_FROM=your-email@gmail.com
 2. **Generate App Password**:
    - Go to: https://myaccount.google.com/apppasswords
    - Select "Mail" and "Other (Custom name)"
-    - Enter "BOOTMARK Form Builder"
+    - Enter "BootMark Landscaping Management"
    - Copy the 16-character password
 3. **Use in `.env`**:
    ```env

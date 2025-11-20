@@ -1,4 +1,4 @@
-# Deployment Guide - BOOTMARK Form Builder on Render
+# Deployment Guide - BootMark Landscaping Management on Render
 
 ## Quick Deploy to Render
 
@@ -101,7 +101,7 @@ If you have a `render.yaml` file in your repository root, Render will automatica
 ```yaml
 services:
   - type: web
-    name: phoenix-form-builder
+    name: bootmark-landscaping-management
     env: node
     plan: starter
     buildCommand: npm install && cd public && npm install && npm run build

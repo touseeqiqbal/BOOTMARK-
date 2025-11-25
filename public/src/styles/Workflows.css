@@ -1,0 +1,151 @@
+.workflows-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.workflows-header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 20px 0;
+  margin-bottom: 30px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-content h1 {
+  flex: 1;
+  font-size: 24px;
+  color: #1f2937;
+}
+
+.workflows-intro {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.workflows-intro h2 {
+  margin-bottom: 10px;
+  color: #1f2937;
+}
+
+.workflows-intro p {
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.workflows-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.workflow-card {
+  background: white;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.workflow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.workflow-title-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.workflow-name-input {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.workflow-name-input:focus {
+  outline: none;
+  background: white;
+  border: 1px solid #4f46e5;
+}
+
+.workflow-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.workflow-toggle input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+}
+
+.workflow-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.workflow-actions {
+  margin-top: 20px;
+}
+
+.actions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.actions-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #374151;
+}
+
+.action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 15px;
+  background: #f9fafb;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.action-type {
+  min-width: 150px;
+}
+
+.action-config {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.add-workflow-btn {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 16px;
+}

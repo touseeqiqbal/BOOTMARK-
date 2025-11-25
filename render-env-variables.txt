@@ -1,0 +1,45 @@
+========================================
+RENDER ENVIRONMENT VARIABLES FOR FIRESTORE
+========================================
+
+Copy these values to Render Dashboard → Your Service → Environment → Environment Variables
+
+----------------------------------------
+FIREBASE_PROJECT_ID
+----------------------------------------
+phoenix-app-5a433
+
+----------------------------------------
+FIREBASE_SERVICE_ACCOUNT
+----------------------------------------
+
+========================================
+INSTRUCTIONS
+========================================
+
+1. Go to Render Dashboard
+2. Select your service
+3. Go to Environment → Environment Variables
+4. Click "Add Environment Variable"
+5. Add FIREBASE_PROJECT_ID with the value above
+6. Add FIREBASE_SERVICE_ACCOUNT with the entire JSON string above (it's one long line)
+7. Save and redeploy your service
+
+CRITICAL IMPORTANT NOTES:
+- FIREBASE_SERVICE_ACCOUNT must be copied as ONE SINGLE LINE (no line breaks)
+- Make sure to copy the ENTIRE JSON string including all the curly braces
+- DO NOT ADD QUOTES around the value when pasting in Render
+  - Correct: FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}
+  - Wrong: FIREBASE_SERVICE_ACCOUNT="{"type":"service_account",...}"
+- The value should start with { and end with }
+- Render will automatically quote the value - you don't need to add quotes
+- After adding variables, check Render logs for:
+  ✅ Firebase Admin initialized from FIREBASE_SERVICE_ACCOUNT environment variable
+  ✅ Firestore credentials verified successfully
+- If you see authentication errors, verify:
+  1. The value has NO quotes around it in Render
+  2. The value is ONE continuous line with no breaks
+  3. The value starts with { and ends with }
+
+========================================
+

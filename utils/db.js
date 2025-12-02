@@ -249,45 +249,107 @@ if (useFirestore) {
   }
 }
 
+// Helper: retry wrapper for Firestore operations
+async function retryFirestoreOperation(operation, maxRetries = 3, delay = 1000) {
+  let lastError
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation()
+    } catch (error) {
+      lastError = error
+      // Don't retry on authentication errors (code 16) - these won't be fixed by retrying
+      if (error.code === 16 || error.code === 7) {
+        throw error
+      }
+      // Retry on network errors, timeouts, or temporary failures
+      if (attempt < maxRetries) {
+        const waitTime = delay * attempt
+        console.warn(`⚠️  Firestore operation failed (attempt ${attempt}/${maxRetries}), retrying in ${waitTime}ms...`, error.message)
+        await new Promise(resolve => setTimeout(resolve, waitTime))
+      }
+    }
+  }
+  throw lastError
+}
+
+// Helper: check Firestore connection health
+async function checkFirestoreHealth() {
+  if (!useFirestore || !db) return false
+  try {
+    const testDoc = db.collection('_healthcheck').doc('connection_test')
+    await testDoc.get()
+    return true
+  } catch (error) {
+    console.error('❌ Firestore health check failed:', error.message)
+    if (error.code === 16 || error.code === 7) {
+      console.error('   Authentication error - service account may have been revoked or expired')
+    }
+    return false
+  }
+}
+
 // Helper: get collection reference
 function getCollectionRef(name) {
   if (!useFirestore) throw new Error('Firestore not initialized')
   return db.collection(name)
 }
 
-// Helper: get a single document by id
+// Helper: get a single document by id (with retry)
 async function getDoc(collection, id) {
   if (!useFirestore) throw new Error('Firestore not initialized')
-  const snap = await db.collection(collection).doc(id).get()
-  if (!snap.exists) return null
-  return { id: snap.id, ...snap.data() }
+  return retryFirestoreOperation(async () => {
+    const snap = await db.collection(collection).doc(id).get()
+    if (!snap.exists) return null
+    return { id: snap.id, ...snap.data() }
+  })
 }
 
-// Helper: set/create/update a document
+// Helper: set/create/update a document (with retry)
 async function setDoc(collection, id, data) {
   if (!useFirestore) throw new Error('Firestore not initialized')
-  await db.collection(collection).doc(id).set(data)
-  return { id, ...data }
+  return retryFirestoreOperation(async () => {
+    await db.collection(collection).doc(id).set(data)
+    return { id, ...data }
+  })
 }
 
-// Helper: delete a document
+// Helper: delete a document (with retry)
 async function deleteDoc(collection, id) {
   if (!useFirestore) throw new Error('Firestore not initialized')
-  await db.collection(collection).doc(id).delete()
+  return retryFirestoreOperation(async () => {
+    await db.collection(collection).doc(id).delete()
+  })
 }
 
 // Helper: query documents where a field is in a list (handles Firestore 10-item 'in' limit)
 async function queryByFieldIn(collection, field, values) {
   if (!useFirestore) throw new Error('Firestore not initialized')
   if (!Array.isArray(values) || values.length === 0) return []
-  const chunkSize = 10
-  const results = []
-  for (let i = 0; i < values.length; i += chunkSize) {
-    const chunk = values.slice(i, i + chunkSize)
-    const snap = await db.collection(collection).where(field, 'in', chunk).get()
-    snap.forEach(doc => results.push({ id: doc.id, ...doc.data() }))
-  }
-  return results
+  return retryFirestoreOperation(async () => {
+    const chunkSize = 10
+    const results = []
+    for (let i = 0; i < values.length; i += chunkSize) {
+      const chunk = values.slice(i, i + chunkSize)
+      const snap = await db.collection(collection).where(field, 'in', chunk).get()
+      snap.forEach(doc => results.push({ id: doc.id, ...doc.data() }))
+    }
+    return results
+  })
 }
 
-module.exports = { admin, db, useFirestore, getCollectionRef, getDoc, setDoc, deleteDoc, queryByFieldIn }
+// Periodic health check (every 5 minutes in production)
+if (useFirestore && db && (process.env.NODE_ENV === 'production' || process.env.RENDER)) {
+  setInterval(async () => {
+    const isHealthy = await checkFirestoreHealth()
+    if (!isHealthy) {
+      console.error('❌ Periodic Firestore health check failed!')
+      console.error('   This may indicate:')
+      console.error('   1. Service account credentials expired or were revoked')
+      console.error('   2. Firestore service is temporarily unavailable')
+      console.error('   3. Network connectivity issues')
+      console.error('   Check Firebase Console and Render logs for more details')
+    }
+  }, 5 * 60 * 1000) // Check every 5 minutes
+}
+
+module.exports = { admin, db, useFirestore, getCollectionRef, getDoc, setDoc, deleteDoc, queryByFieldIn, checkFirestoreHealth }

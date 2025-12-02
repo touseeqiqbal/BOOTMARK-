@@ -25,16 +25,31 @@ try {
           throw new Error('Invalid service account: missing "client_email" field')
         }
         
-        // Ensure private_key has proper newlines (handle both \n strings and actual newlines)
-        // The private key should have actual newline characters, not \n strings
-        if (creds.private_key.includes('\\n')) {
-          // Replace escaped newlines with actual newlines
-          creds.private_key = creds.private_key.replace(/\\n/g, '\n')
+        // Ensure private_key has proper newlines
+        // Handle multiple cases: \\n (double escaped), \n (JSON escaped), or actual newlines
+        if (typeof creds.private_key === 'string') {
+          // First, handle double-escaped newlines (\\n)
+          if (creds.private_key.includes('\\n')) {
+            creds.private_key = creds.private_key.replace(/\\n/g, '\n')
+          }
+          // Also handle single-escaped newlines that might come from environment variables
+          // JSON.parse should handle this, but sometimes environment variables need extra handling
+          if (creds.private_key.includes('\\n') && !creds.private_key.includes('\n')) {
+            // If we still have \n but no actual newlines, try replacing
+            creds.private_key = creds.private_key.replace(/\\n/g, '\n')
+          }
         }
         
         // Validate private key format
+        if (!creds.private_key || typeof creds.private_key !== 'string') {
+          throw new Error('Private key is missing or invalid type')
+        }
         if (!creds.private_key.includes('BEGIN PRIVATE KEY') || !creds.private_key.includes('END PRIVATE KEY')) {
           console.warn('⚠️  Warning: Private key format may be incorrect')
+          console.warn('   Private key length:', creds.private_key.length)
+          console.warn('   First 50 chars:', creds.private_key.substring(0, 50))
+          console.warn('   Contains BEGIN:', creds.private_key.includes('BEGIN'))
+          console.warn('   Contains END:', creds.private_key.includes('END'))
         }
         
         app = admin.initializeApp({ 
@@ -163,26 +178,51 @@ if (useFirestore) {
           console.error('❌ Firestore authentication failed!')
           console.error('   Error Code:', testError.code)
           console.error('   Error Message:', testError.message)
-          console.error('\n   Common causes:')
+          console.error('')
+          
+          // Additional debugging info
+          if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+            try {
+              const testCreds = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+              console.error('   Debug Info:')
+              console.error('   - Service account parsed successfully')
+              console.error('   - Project ID:', testCreds.project_id)
+              console.error('   - Client Email:', testCreds.client_email)
+              console.error('   - Private key length:', testCreds.private_key?.length || 'missing')
+              console.error('   - Private key has newlines:', testCreds.private_key?.includes('\n') ? 'YES' : 'NO')
+              console.error('   - Private key has \\n:', testCreds.private_key?.includes('\\n') ? 'YES' : 'NO')
+              console.error('   - Private key starts correctly:', testCreds.private_key?.startsWith('-----BEGIN') ? 'YES' : 'NO')
+            } catch (debugError) {
+              console.error('   - Could not parse FIREBASE_SERVICE_ACCOUNT for debugging')
+            }
+          }
+          
+          console.error('')
+          console.error('   Common causes:')
           console.error('   1. FIREBASE_SERVICE_ACCOUNT environment variable is malformed in Render')
           console.error('   2. Private key newlines are not preserved correctly')
           console.error('   3. Service account lacks Firestore permissions')
           console.error('   4. Service account has been disabled or revoked')
-          console.error('\n   Troubleshooting steps:')
+          console.error('')
+          console.error('   Troubleshooting steps:')
           console.error('   1. Verify FIREBASE_SERVICE_ACCOUNT in Render Dashboard')
           console.error('      - It should be ONE long line (no line breaks)')
           console.error('      - It should start with {" and end with "}')
+          console.error('      - The private_key field should contain \\n (backslash-n) for newlines')
           console.error('      - Run: node scripts/prepare-firestore-env.js to get correct format')
           console.error('   2. Check Firebase Console → IAM & Admin → Service Accounts')
           console.error('      - Verify the service account exists and is enabled')
+          console.error('      - Check that it has "Firebase Admin SDK Administrator Service Agent" role')
           console.error('   3. Check Firebase Console → Firestore Database')
           console.error('      - Verify Firestore is enabled for your project')
           console.error('   4. Generate a new service account key if needed:')
           console.error('      - Firebase Console → Project Settings → Service Accounts')
           console.error('      - Click "Generate new private key"')
+          console.error('      - Make sure to copy the ENTIRE JSON including all \\n in private_key')
+          initError = testError
         } else {
-          console.warn('⚠️  Firestore health check failed:', testError.message)
-          console.warn('   Error Code:', testError.code)
+          // Other errors (network, etc.) - don't treat as fatal
+          console.warn('⚠️  Could not verify Firestore credentials:', testError.message)
         }
       }
     }, 2000) // Wait 2 seconds after startup to let everything initialize

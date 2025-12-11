@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './utils/AuthContext'
+import { CustomizationProvider } from './utils/CustomizationContext'
 import ModernSidebar from './components/ModernSidebar'
 import Login from './pages/Login'
 import Register from './pages/Register'

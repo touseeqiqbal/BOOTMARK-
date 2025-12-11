@@ -1,0 +1,531 @@
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Save, Calendar, MapPin, DollarSign, User, Plus, Trash2, Edit, X } from 'lucide-react';
+import api from '../utils/api';
+import logo from '../assets/logo.svg';
+import ServiceSelectorModal from '../components/ServiceSelectorModal';
+import QuickAddClientModal from '../components/QuickAddClientModal';
+import QuickAddPropertyModal from '../components/QuickAddPropertyModal';
+
+export default function WorkOrderForm() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [clients, setClients] = useState([]);
+    const [properties, setProperties] = useState([]);
+    const [templates, setTemplates] = useState([]);
+    const [showServiceModal, setShowServiceModal] = useState(false);
+    const [showClientModal, setShowClientModal] = useState(false);
+    const [showPropertyModal, setShowPropertyModal] = useState(false);
+    const [formData, setFormData] = useState({
+        clientId: '',
+        clientName: '',
+        propertyId: '',
+        address: '',
+        templateId: '',
+        templateName: '',
+        title: '',
+        description: '',
+        status: 'draft',
+        scheduledDate: '',
+        estimatedDuration: '',
+        price: '',
+        notes: '',
+        items: [],
+        templateResponses: {} // Store form field responses
+    });
+
+    const isEditMode = !!id;
+
+    useEffect(() => {
+        fetchClients();
+        fetchTemplates();
+        if (isEditMode) {
+            fetchWorkOrder();
+        }
+    }, [id]);
+
+    useEffect(() => {
+        if (formData.clientId) {
+            fetchClientProperties(formData.clientId);
+        }
+    }, [formData.clientId]);
+
+    const fetchClients = async () => {
+        try {
+            const res = await api.get('/customers');
+            setClients(res.data);
+        } catch (error) {
+            console.error('Failed to fetch clients', error);
+        }
+    };
+
+    const fetchTemplates = async () => {
+        try {
+            const res = await api.get('/work-order-templates');
+            setTemplates(res.data || []);
+        } catch (error) {
+            console.error('Failed to fetch templates', error);
+        }
+    };
+
+    const fetchClientProperties = async (clientId) => {
+        try {
+            const res = await api.get(`/properties?customerId=${clientId}`);
+            setProperties(res.data);
+        } catch (error) {
+            console.error('Failed to fetch properties', error);
+        }
+    };
+
+    const fetchWorkOrder = async () => {
+        try {
+            // Mock fetch for now
+        } catch (error) {
+            console.error('Failed to fetch work order', error);
+        }
+    }
+
+    const handleClientChange = (e) => {
+        const clientId = e.target.value;
+        const client = clients.find(c => c.id === clientId);
+        setFormData(prev => ({
+            ...prev,
+            clientId,
+            clientName: client ? client.name : '',
+            propertyId: '',
+            address: ''
+        }));
+    };
+
+
+    const handlePropertyChange = (e) => {
+        const propertyId = e.target.value;
+        const property = properties.find(p => p.id === propertyId);
+        setFormData(prev => ({
+            ...prev,
+            propertyId,
+            address: property ? `${property.address}, ${property.city}` : ''
+        }));
+    };
+
+
+    const handleTemplateChange = (e) => {
+        const templateId = e.target.value;
+        const template = templates.find(f => f.id === templateId);
+
+        if (template) {
+            const templateTitle = template.name || 'Untitled Template';
+            // Initialize empty responses for custom fields
+            const initialResponses = {};
+            if (template.fields && Array.isArray(template.fields)) {
+                template.fields.forEach(field => {
+                    initialResponses[field.id] = '';
+                });
+            }
+
+            setFormData(prev => ({
+                ...prev,
+                templateId,
+                templateName: templateTitle,
+                title: templateTitle,
+                description: template.description || '',
+                estimatedDuration: template.defaultDuration || '',
+                price: template.defaultPrice || '',
+                status: template.defaultStatus || 'draft',
+                templateResponses: initialResponses
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                templateId: '',
+                templateName: '',
+                title: '',
+                description: '',
+                estimatedDuration: '',
+                price: '',
+                status: 'draft',
+                templateResponses: {}
+            }));
+        }
+    };
+
+    const handleAddServices = (services) => {
+        if (!Array.isArray(services)) return;
+
+        const newItems = services.map(s => ({
+            id: s.id || `temp-${Date.now()}-${Math.random()}`,
+            name: s.name || 'Unknown Service',
+            description: s.description || '',
+            price: s.price !== undefined ? s.price : 0,
+            unit: s.unit || 'flat'
+        }));
+
+        setFormData(prev => {
+            const combined = [...(prev.items || []), ...newItems];
+
+            const total = combined.reduce((sum, item) => {
+                const p = parseFloat(item.price);
+                return sum + (isNaN(p) ? 0 : p);
+            }, 0);
+
+            return {
+                ...prev,
+                items: combined,
+                price: total.toFixed(2)
+            };
+        });
+    };
+
+    const removeServiceItem = (index) => {
+        setFormData(prev => {
+            const newItems = [...prev.items];
+            newItems.splice(index, 1);
+            const total = newItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+            return {
+                ...prev,
+                items: newItems,
+                price: total.toFixed(2)
+            };
+        });
+    };
+
+    const handleClientCreated = (newClient) => {
+        if (!newClient || !newClient.id) return;
+
+        setClients(prev => [...prev, newClient]);
+        setFormData(prev => ({
+            ...prev,
+            clientId: newClient.id,
+            clientName: newClient.name,
+            propertyId: '',
+            address: ''
+        }));
+        setProperties([]);
+    };
+
+    const handlePropertyCreated = (newProp) => {
+        setProperties(prev => [...prev, newProp]);
+        setFormData(prev => ({
+            ...prev,
+            propertyId: newProp.id,
+            address: `${newProp.address}, ${newProp.city}`
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            if (isEditMode) {
+                await api.put(`/work-orders/${id}`, formData);
+            } else {
+                await api.post('/work-orders', formData);
+            }
+            navigate('/work-orders');
+        } catch (error) {
+            console.error('Failed to save work order', error);
+            alert('Failed to save work order');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="dashboard">
+            <header className="dashboard-header">
+                <div className="container">
+                    <div className="header-content">
+                        <div className="dashboard-brand">
+                            <img src={logo} alt="BOOTMARK Logo" className="brand-logo" />
+                            <div className="brand-text">
+                                <h1 className="brand-title">{isEditMode ? 'Edit Work Order' : 'New Work Order'}</h1>
+                            </div>
+                        </div>
+                        <div className="header-actions">
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => navigate('/work-orders')}
+                                type="button"
+                            >
+                                <ArrowLeft size={18} /> Cancel
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={handleSubmit}
+                                disabled={loading}
+                            >
+                                <Save size={18} /> Save Work Order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div className="container">
+                <form onSubmit={handleSubmit} className="form-card" style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '32px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+
+                    <div className="form-group" style={{ marginBottom: '24px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Select Template (Optional)</label>
+                        <select
+                            value={formData.templateId}
+                            onChange={handleTemplateChange}
+                            className="form-control"
+                            style={{ width: '100%', padding: '10px', fontSize: '16px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                        >
+                            <option value="">-- No Template (Custom Job) --</option>
+                            {templates.map(template => (
+                                <option key={template.id} value={template.id}>
+                                    {template.name || `Template ${template.id.substring(0, 8)}`}
+                                </option>
+                            ))}
+                        </select>
+                        <small style={{ display: 'block', marginTop: '4px', color: '#6b7280' }}>
+                            Select a form template to auto-fill job details, or leave blank for custom work order
+                        </small>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '24px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Title / Job Name</label>
+                        <input
+                            type="text"
+                            required
+                            placeholder="e.g. Spring Cleanup"
+                            value={formData.title}
+                            onChange={e => setFormData({ ...formData, title: e.target.value })}
+                            className="form-control"
+                            style={{ width: '100%', padding: '10px', fontSize: '16px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                        />
+                    </div>
+
+                    {/* Render Form Fields if Template Selected */}
+                    {formData.templateId && (() => {
+                        console.log('[WorkOrderForm] Template ID selected:', formData.templateId);
+                        console.log('[WorkOrderForm] Available templates:', templates.length);
+                        const selectedTemplate = templates.find(t => t.id === formData.templateId);
+                        console.log('[WorkOrderForm] Selected template:', selectedTemplate);
+                        console.log('[WorkOrderForm] Template fields:', selectedTemplate?.fields);
+
+                        if (!selectedTemplate || !selectedTemplate.fields || selectedTemplate.fields.length === 0) {
+                            console.log('[WorkOrderForm] No template or no fields found');
+                            return null;
+                        }
+
+                        console.log('[WorkOrderForm] Rendering', selectedTemplate.fields.length, 'fields');
+                        return (
+                            <div style={{ marginBottom: '24px', padding: '20px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                                <h3 style={{ marginBottom: '16px', fontSize: '18px', fontWeight: '600', color: '#111827' }}>
+                                    Form Fields
+                                    ...prev.templateResponses,
+                                    [field.id]: newValues
+                                                                            }
+                                                                        }));
+                                                                    }}
+                                                                />
+                                    <span>{opt}</span>
+                                </label>
+                                );
+                                                    })}
+                            </div>
+                        )
+                    }
+                                        </div>
+                                    ))}
+        </div>
+                            </div >
+                        );
+}) ()}
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                        <div className="form-group">
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: '500' }}>
+                                <User size={16} /> Client
+                            </label>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <select
+                                    required
+                                    value={formData.clientId}
+                                    onChange={handleClientChange}
+                                    className="form-control"
+                                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                                >
+                                    <option value="">-- Select Client --</option>
+                                    {clients.map(client => (
+                                        <option key={client.id} value={client.id}>{client.name}</option>
+                                    ))}
+                                </select>
+                                <button type="button" onClick={() => setShowClientModal(true)} className="btn btn-secondary" style={{ padding: '0 12px' }} title="New Client">
+                                    <Plus size={18} />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: '500' }}>
+                                <MapPin size={16} /> Property
+                            </label>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <select
+                                    required
+                                    value={formData.propertyId}
+                                    onChange={handlePropertyChange}
+                                    disabled={!formData.clientId}
+                                    className="form-control"
+                                    style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                                >
+                                    <option value="">-- Select Property --</option>
+                                    {properties.map(property => (
+                                        <option key={property.id} value={property.id}>{property.address}</option>
+                                    ))}
+                                </select>
+                                <button type="button" onClick={() => setShowPropertyModal(true)} className="btn btn-secondary" style={{ padding: '0 12px' }} title="New Property" disabled={!formData.clientId}>
+                                    <Plus size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                        <div className="form-group">
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: '500' }}>
+                                <Calendar size={16} /> Scheduled Date
+                            </label>
+                            <input
+                                type="date"
+                                value={formData.scheduledDate ? formData.scheduledDate.split('T')[0] : ''}
+                                onChange={e => setFormData({ ...formData, scheduledDate: e.target.value })}
+                                className="form-control"
+                                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: '500' }}>
+                                Status
+                            </label>
+                            <select
+                                value={formData.status}
+                                onChange={e => setFormData({ ...formData, status: e.target.value })}
+                                className="form-control"
+                                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                            >
+                                <option value="draft">Draft</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="invoiced">Invoiced</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: '500' }}>
+                                <DollarSign size={16} /> Price ($)
+                            </label>
+                            <input
+                                type="number"
+                                placeholder="0.00"
+                                value={formData.price}
+                                onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                className="form-control"
+                                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '24px' }}>
+                        <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontWeight: '500' }}>
+                            <span>Work Order Items</span>
+                            <button type="button" onClick={() => setShowServiceModal(true)} className="btn btn-sm btn-outline" style={{ display: 'flex', gap: '4px', alignItems: 'center', fontSize: '13px' }}>
+                                <Plus size={14} /> Add Services
+                            </button>
+                        </label>
+
+                        {formData.items && formData.items.length > 0 ? (
+                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                                    <thead style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                                        <tr>
+                                            <th style={{ padding: '8px 12px', textAlign: 'left' }}>Service</th>
+                                            <th style={{ padding: '8px 12px', textAlign: 'left' }}>Description</th>
+                                            <th style={{ padding: '8px 12px', textAlign: 'right' }}>Price</th>
+                                            <th style={{ padding: '8px 12px', width: '40px' }}></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {formData.items.map((item, idx) => (
+                                            <tr key={idx} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                                <td style={{ padding: '8px 12px' }}>{item.name}</td>
+                                                <td style={{ padding: '8px 12px', color: '#6b7280', fontSize: '13px' }}>{item.description}</td>
+                                                <td style={{ padding: '8px 12px', textAlign: 'right', fontFamily: 'monospace' }}>${item.price}</td>
+                                                <td style={{ padding: '8px 12px' }}>
+                                                    <button type="button" onClick={() => removeServiceItem(idx)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444' }}>
+                                                        <X size={16} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div style={{ padding: '16px', background: '#f9fafb', borderRadius: '8px', border: '1px dashed #d1d5db', textAlign: 'center', color: '#6b7280', fontSize: '14px' }}>
+                                No services added. Click "Add Services" to select from catalog.
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '24px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Description (Additional Notes)</label>
+                        <textarea
+                            rows={3}
+                            value={formData.description}
+                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                            className="form-control"
+                            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                            placeholder="Usage notes..."
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Internal Notes</label>
+                        <textarea
+                            rows={3}
+                            value={formData.notes}
+                            onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                            className="form-control"
+                            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                            placeholder="Access codes, crew instructions, etc."
+                        />
+                    </div>
+
+                </form >
+            </div >
+
+    { showServiceModal && (
+        <ServiceSelectorModal
+            onClose={() => setShowServiceModal(false)}
+            onSelect={handleAddServices}
+        />
+    )}
+
+{
+    showClientModal && (
+        <QuickAddClientModal
+            onClose={() => setShowClientModal(false)}
+            onConfirm={handleClientCreated}
+        />
+    )
+}
+
+{
+    showPropertyModal && (
+        <QuickAddPropertyModal
+            onClose={() => setShowPropertyModal(false)}
+            onConfirm={handlePropertyCreated}
+            clientId={formData.clientId}
+        />
+    )
+}
+        </div >
+    );
+}

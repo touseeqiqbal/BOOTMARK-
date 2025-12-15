@@ -45,6 +45,25 @@ const EMPLOYEE_PERMISSIONS = [
     { value: 'team.view', label: 'View Team Members', category: 'Team' },
 ];
 
+// Migration map for old permission values to new standardized values
+const PERMISSION_MIGRATION_MAP = {
+    'view_reports': 'reports.view',
+    'manage_clients': 'customers.view',
+    'manage_work_orders': 'workOrders.view',
+    'manage_invoices': 'invoices.view',
+    'manage_employees': 'team.view',
+    'manage_materials': 'products.view',
+    'view_scheduling': 'scheduling.view',
+    'manage_scheduling': 'scheduling.edit'
+};
+
+// Function to migrate old permissions to new format
+function migratePermissions(permissions) {
+    if (!Array.isArray(permissions)) return [];
+    return permissions.map(perm => PERMISSION_MIGRATION_MAP[perm] || perm);
+}
+
+
 
 export default function Employees() {
     const navigate = useNavigate();
@@ -90,7 +109,7 @@ export default function Employees() {
                 phone: employee.phone || '',
                 role: employee.role || 'crew',
                 skills: employee.skills || [],
-                permissions: employee.permissions || [],
+                permissions: migratePermissions(employee.permissions || []), // Migrate old permissions
                 status: employee.status || 'active'
             });
         } else {

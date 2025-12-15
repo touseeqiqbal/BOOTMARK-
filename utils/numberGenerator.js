@@ -1,10 +1,12 @@
 const fs = require('fs').promises;
 const path = require('path');
+const { useFirestore, getCollectionRef, getDoc, setDoc } = require('./db');
 
 /**
  * Number Generator Utility
  * Generates custom formatted numbers for work orders, invoices, clients, etc.
  * Supports multi-tenant isolation with separate counters per business
+ * Supports both Firestore and JSON file storage
  */
 
 const DATA_DIR = path.join(__dirname, '../data');
@@ -106,23 +108,57 @@ function parseFormat(format, counter, padding = 5) {
 }
 
 /**
- * Read businesses data
+ * Read businesses data (supports both Firestore and JSON)
  */
 async function readBusinesses() {
+    if (useFirestore) {
+        try {
+            const snap = await getCollectionRef('businesses').get();
+            const businesses = [];
+            snap.forEach(doc => {
+                businesses.push({ id: doc.id, ...doc.data() });
+            });
+            return businesses;
+        } catch (error) {
+            console.error('Error reading businesses from Firestore:', error);
+            return [];
+        }
+    }
+
+    // Fallback to JSON file
     try {
         const data = await fs.readFile(BUSINESSES_FILE, 'utf8');
         return JSON.parse(data);
     } catch (error) {
-        console.error('Error reading businesses file:', error);
+        if (error.code !== 'ENOENT') {
+            console.error('Error reading businesses file:', error);
+        }
         return [];
     }
 }
 
 /**
- * Write businesses data
+ * Write businesses data (supports both Firestore and JSON)
  */
 async function writeBusinesses(businesses) {
+    if (useFirestore) {
+        try {
+            // Update each business document in Firestore
+            for (const business of businesses) {
+                if (business.id) {
+                    await setDoc('businesses', business.id, business);
+                }
+            }
+            return;
+        } catch (error) {
+            console.error('Error writing businesses to Firestore:', error);
+            throw error;
+        }
+    }
+
+    // Fallback to JSON file
     try {
+        await fs.mkdir(DATA_DIR, { recursive: true });
         await fs.writeFile(BUSINESSES_FILE, JSON.stringify(businesses, null, 2));
     } catch (error) {
         console.error('Error writing businesses file:', error);
@@ -193,6 +229,68 @@ async function updateNumberFormats(businessId, formats) {
  * @returns {Promise<string>} Generated number
  */
 async function generateNumber(businessId, type) {
+    if (useFirestore) {
+        // Use Firestore transaction for atomic counter update
+        const admin = require('firebase-admin');
+        const db = admin.firestore();
+        const businessRef = db.collection('businesses').doc(businessId);
+
+        try {
+            const generatedNumber = await db.runTransaction(async (transaction) => {
+                const businessDoc = await transaction.get(businessRef);
+
+                if (!businessDoc.exists) {
+                    throw new Error(`Business not found: ${businessId}`);
+                }
+
+                const businessData = businessDoc.data();
+
+                // Initialize number formats if not exists
+                if (!businessData.numberFormats) {
+                    businessData.numberFormats = JSON.parse(JSON.stringify(DEFAULT_FORMATS));
+                }
+
+                const config = businessData.numberFormats[type];
+
+                if (!config) {
+                    throw new Error(`Invalid number type: ${type}`);
+                }
+
+                // Check if counter should be reset
+                if (shouldResetCounter(config)) {
+                    config.counter = 1;
+                    config.lastReset = new Date().toISOString();
+                }
+
+                // Get current counter value
+                const currentCounter = config.counter || 1;
+
+                // Generate the number
+                const generatedNumber = parseFormat(
+                    config.format,
+                    currentCounter,
+                    config.padding
+                );
+
+                // Increment counter for next time
+                config.counter = currentCounter + 1;
+
+                // Update business document with new counter
+                transaction.update(businessRef, {
+                    numberFormats: businessData.numberFormats
+                });
+
+                return generatedNumber;
+            });
+
+            return generatedNumber;
+        } catch (error) {
+            console.error('Error generating number in Firestore:', error);
+            throw error;
+        }
+    }
+
+    // Fallback to JSON file method
     const businesses = await readBusinesses();
     const businessIndex = businesses.findIndex(b => b.id === businessId);
 

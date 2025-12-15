@@ -38,7 +38,15 @@ export default function ModernSidebar() {
 
     const canManageForms = hasPermission(user, 'forms')
     const canManageCustomers = hasPermission(user, 'customers')
+    const canManageProperties = hasPermission(user, 'properties')
+    const canManageWorkOrders = hasPermission(user, 'workOrders')
     const canManageInvoices = hasPermission(user, 'invoices')
+    const canManageScheduling = hasPermission(user, 'scheduling')
+    const canManageContracts = hasPermission(user, 'contracts')
+    const canManageServices = hasPermission(user, 'services')
+    const canManageProducts = hasPermission(user, 'products')
+    const canManageTeam = hasPermission(user, 'team')
+    const canManageReports = hasPermission(user, 'reports')
     const canManageSettings = hasPermission(user, 'business.settings') || hasPermission(user, 'settings')
     const canManageUsers = hasPermission(user, 'users.manage') || hasPermission(user, 'settings')
 
@@ -49,44 +57,44 @@ export default function ModernSidebar() {
                 { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', permission: true },
                 { icon: FileText, label: 'Forms', path: '/forms', permission: canManageForms },
                 { icon: Users, label: 'Clients', path: '/clients', permission: canManageCustomers },
-                { icon: MapPin, label: 'Properties', path: '/properties', permission: canManageCustomers },
+                { icon: MapPin, label: 'Properties', path: '/properties', permission: canManageProperties || canManageCustomers },
             ]
         },
         {
             section: 'Operations',
             items: [
-                { icon: ClipboardList, label: 'Work Orders', path: '/work-orders', permission: true },
-                { icon: Calendar, label: 'Scheduling', path: '/scheduling', permission: true },
-                { icon: Briefcase, label: 'Contracts', path: '/contracts', permission: true },
+                { icon: ClipboardList, label: 'Work Orders', path: '/work-orders', permission: canManageWorkOrders },
+                { icon: Calendar, label: 'Scheduling', path: '/scheduling', permission: canManageScheduling },
+                { icon: Briefcase, label: 'Contracts', path: '/contracts', permission: canManageContracts },
             ]
         },
         {
             section: 'Catalog',
             items: [
-                { icon: Wrench, label: 'Services', path: '/services', permission: true },
-                { icon: Package, label: 'Products', path: '/products', permission: true },
-                { icon: Package, label: 'Materials', path: '/materials', permission: true },
+                { icon: Wrench, label: 'Services', path: '/services', permission: canManageServices },
+                { icon: Package, label: 'Products', path: '/products', permission: canManageProducts },
+                { icon: Package, label: 'Materials', path: '/materials', permission: canManageProducts },
             ]
         },
         {
             section: 'Finance',
             items: [
-                { icon: FileText, label: 'Estimates', path: '/estimates', permission: true },
+                { icon: FileText, label: 'Estimates', path: '/estimates', permission: canManageInvoices },
                 { icon: CreditCard, label: 'Invoices', path: '/invoices', permission: canManageInvoices },
             ]
         },
         {
             section: 'Team',
             items: [
-                { icon: UserCircle, label: 'Employees', path: '/employees', permission: true },
-                { icon: Home, label: 'Crew Mobile', path: '/crew-mobile', permission: true },
+                { icon: UserCircle, label: 'Employees', path: '/employees', permission: canManageTeam },
+                { icon: Home, label: 'Crew Mobile', path: '/crew-mobile', permission: canManageTeam },
             ]
         },
         {
             section: 'Analytics',
             items: [
-                { icon: BarChart3, label: 'Business Reports', path: '/business-reports', permission: true },
-                { icon: TrendingUp, label: 'Analytics', path: '/analytics', permission: true },
+                { icon: BarChart3, label: 'Business Reports', path: '/business-reports', permission: canManageReports },
+                { icon: TrendingUp, label: 'Analytics', path: '/analytics', permission: canManageReports },
             ]
         },
         {

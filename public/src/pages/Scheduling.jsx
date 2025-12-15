@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Calendar as CalendarIcon, Clock, MapPin, Users, Plus, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, MapPin, Users, Plus, Filter, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import api from '../utils/api';
 import logo from '../assets/logo.svg';
 import ScheduleModal from '../components/ScheduleModal';
@@ -174,6 +174,19 @@ export default function Scheduling() {
         } catch (error) {
             console.error('Error updating status:', error);
             alert('Failed to update status');
+        }
+    };
+
+    const handleDelete = async (eventId) => {
+        if (!confirm('Are you sure you want to delete this scheduled event?')) return;
+
+        try {
+            await api.delete(`/scheduling/${eventId}`);
+            fetchData();
+            setShowModal(false);
+        } catch (error) {
+            console.error('Error deleting event:', error);
+            alert('Failed to delete event');
         }
     };
 
@@ -513,14 +526,31 @@ export default function Scheduling() {
                             <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
                                 Close
                             </button>
-                            {selectedEvent.workOrderId && (
+                            <div style={{ display: 'flex', gap: '8px' }}>
                                 <button
                                     className="btn btn-primary"
-                                    onClick={() => navigate(`/work-orders/${selectedEvent.workOrderId}`)}
+                                    onClick={() => {
+                                        handleEditSchedule(selectedEvent);
+                                        setShowModal(false);
+                                    }}
                                 >
-                                    View Work Order
+                                    Edit Schedule
                                 </button>
-                            )}
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={() => handleDelete(selectedEvent.id)}
+                                >
+                                    <Trash2 size={16} /> Delete
+                                </button>
+                                {selectedEvent.workOrderId && (
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={() => navigate(`/work-orders/${selectedEvent.workOrderId}`)}
+                                    >
+                                        View Work Order
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -22,7 +22,12 @@ export function AuthProvider({ children }) {
 
   // Define updateUser before useEffect so it can be used in the closure
   const updateUser = useCallback((userData) => {
-    setUser(prev => prev ? { ...prev, ...userData } : userData)
+    setUser(prev => {
+      const updated = prev ? { ...prev, ...userData } : userData
+      console.log('🔍 [AUTH DEBUG] User updated:', updated)
+      console.log('🔍 [AUTH DEBUG] businessPermissions:', updated.businessPermissions)
+      return updated
+    })
   }, [])
 
   useEffect(() => {
@@ -58,6 +63,8 @@ export function AuthProvider({ children }) {
           // Fetch account data from backend (async, won't block)
           api.get('/auth/account').then(response => {
             if (response.data) {
+              console.log('🔍 [AUTH DEBUG] /auth/account response:', response.data)
+              console.log('🔍 [AUTH DEBUG] businessPermissions from /auth/account:', response.data.businessPermissions)
               updateUser({
                 isAdmin: response.data.isAdmin === true,
                 isSuperAdmin: response.data.isSuperAdmin === true,
@@ -75,6 +82,8 @@ export function AuthProvider({ children }) {
           // Fetch membership info to determine business role/permissions
           api.get('/businesses/my-membership').then(response => {
             if (response.data) {
+              console.log('🔍 [AUTH DEBUG] /my-membership response:', response.data)
+              console.log('🔍 [AUTH DEBUG] NOT overwriting businessPermissions (already set from /auth/account)')
               updateUser({
                 currentBusiness: {
                   id: response.data.businessId,

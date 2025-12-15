@@ -4,9 +4,9 @@ const path = require("path");
 const { getDataFilePath } = require(path.join(__dirname, "..", "utils", "dataPath"));
 const { admin, db, useFirestore, getCollectionRef, getDoc, setDoc, deleteDoc } = require(path.join(__dirname, "..", "utils", "db"));
 const { sendEmail } = require(path.join(__dirname, "..", "utils", "emailService"));
-const { 
-  BUSINESS_PERMISSIONS, 
-  getPermissionsByCategory, 
+const {
+  BUSINESS_PERMISSIONS,
+  getPermissionsByCategory,
   getAllPermissionIds,
   validatePermissions,
   hasPermission: checkPermission
@@ -22,7 +22,7 @@ function getBusinessesFilePath() {
 // Helper to extract user ID from token
 async function extractUserIdFromToken(token) {
   if (!token) return null;
-  
+
   try {
     const parts = token.split('.');
     if (parts.length === 3) {
@@ -32,7 +32,7 @@ async function extractUserIdFromToken(token) {
   } catch (error) {
     console.error("Token decode failed:", error.message);
   }
-  
+
   return null;
 }
 
@@ -232,7 +232,7 @@ router.post("/register", async (req, res) => {
     }
 
     const businesses = await getBusinesses();
-    
+
     // Check if user already has a business
     const existingBusiness = businesses.find(b => b.ownerId === userId);
     if (existingBusiness) {
@@ -273,7 +273,7 @@ router.post("/register", async (req, res) => {
       try {
         const appUrl = process.env.APP_URL || process.env.VERCEL_URL || 'http://localhost:4000'
         const approvalUrl = `${appUrl}/admin/approvals`
-        
+
         await sendEmail({
           to: process.env.APPROVAL_NOTIFY_EMAIL,
           subject: `New business pending approval: ${newBusiness.businessName}`,
@@ -373,8 +373,8 @@ router.put("/update", async (req, res) => {
     }
 
     const businesses = await getBusinesses();
-    const business = businesses.find(b => 
-      b.ownerId === userId || 
+    const business = businesses.find(b =>
+      b.ownerId === userId ||
       (b.members && b.members.some(m => m.userId === userId))
     );
 
@@ -385,7 +385,7 @@ router.put("/update", async (req, res) => {
     // Check if user has permission to update (owner or admin with settings permission)
     const isOwner = business.ownerId === userId;
     const isMember = business.members?.some(m => m.userId === userId);
-    
+
     if (!isOwner && !isMember) {
       return res.status(403).json({ error: "Access denied" });
     }
@@ -395,21 +395,21 @@ router.put("/update", async (req, res) => {
       const member = business.members.find(m => m.userId === userId);
       const users = await getUsers();
       const user = users.find(u => (u.uid || u.id) === userId);
-      
+
       // Check permissions from user document (businessPermissions) or member permissions
       const userPermissions = user?.businessPermissions || member?.permissions || [];
-      const hasSettingsPermission = userPermissions.includes('business.settings') || 
-                                    userPermissions.includes('settings') || 
-                                    userPermissions.includes('settings:write') ||
-                                    user?.isAdmin === true;
-      
+      const hasSettingsPermission = userPermissions.includes('business.settings') ||
+        userPermissions.includes('settings') ||
+        userPermissions.includes('settings:write') ||
+        user?.isAdmin === true;
+
       if (!hasSettingsPermission) {
         return res.status(403).json({ error: "You don't have permission to update business settings. You need the 'Manage Business Settings' permission." });
       }
     }
 
     const businessIndex = businesses.findIndex(b => b.id === business.id || b.businessId === business.businessId);
-    
+
     // Merge customization if provided
     if (req.body.customization) {
       businesses[businessIndex] = {
@@ -467,7 +467,7 @@ router.get("/my-membership", async (req, res) => {
     }
 
     const isOwner = business.ownerId === userId || String(business.ownerId) === String(userId);
-    
+
     // Get user document to retrieve saved businessPermissions (set by super admin)
     // This is the source of truth for permissions, not the member object
     const users = await getUsers();
@@ -475,13 +475,13 @@ router.get("/my-membership", async (req, res) => {
       const uId = u.uid || u.id;
       return uId === userId || String(uId) === String(userId);
     });
-    
+
     // Get permissions from user document (businessPermissions) - this is what super admin saves
     // If user has businessPermissions set, use those (even if empty - means restricted)
     // If not set, use default permissions based on role
     const { getAllPermissionIds } = require('../utils/businessPermissions');
     let finalPermissions = [];
-    
+
     if (user && user.businessPermissions && Array.isArray(user.businessPermissions)) {
       // User has businessPermissions set by super admin - use those
       // This is the source of truth - even if empty array (means restricted)
@@ -493,27 +493,27 @@ router.get("/my-membership", async (req, res) => {
         // Use the new permission system IDs (e.g., "forms.create", "forms.edit")
         finalPermissions = getAllPermissionIds();
       } else {
-        // Get from member object (legacy support)
-        const membership = business.members?.find(m => {
-          const mId = m.userId;
-          return mId === userId || String(mId) === String(userId);
-        }) || {};
-        // If member has old format permissions, we'll need to handle that
-        // But for now, use what's in member.permissions
-        finalPermissions = membership.permissions || [];
+        // For employees/members without businessPermissions:
+        // Return empty array instead of falling back to business.members
+        // This prevents old/incorrect permission values from being used
+        finalPermissions = [];
+
+        // Log warning so we know when this happens
+        console.warn(`⚠️  User ${userId} has no businessPermissions set. Returning empty permissions.`);
+        console.warn(`   To fix: Re-send employee invite or set businessPermissions in user document.`);
       }
     }
-    
+
     const membership = isOwner
       ? {
-          userId,
-          role: "owner",
-          permissions: finalPermissions
-        }
+        userId,
+        role: "owner",
+        permissions: finalPermissions
+      }
       : business.members?.find(m => {
-          const mId = m.userId;
-          return mId === userId || String(mId) === String(userId);
-        }) || {};
+        const mId = m.userId;
+        return mId === userId || String(mId) === String(userId);
+      }) || {};
 
     res.json({
       businessId: business.id,
@@ -551,7 +551,7 @@ router.get("/members", async (req, res) => {
 
     // Get all users to populate member info
     const users = await getUsers();
-    
+
     // Get all members
     const members = (business.members || []).map(member => {
       const user = users.find(u => u.uid === member.userId);
@@ -626,7 +626,7 @@ router.post("/:businessId/approve", async (req, res) => {
   try {
     const { user: adminUser, users } = await requireSuperAdminAccess(req);
     const { permissions } = req.body; // Get permissions from request body
-    
+
     const businesses = await getBusinesses();
     const businessIndex = businesses.findIndex((b) => b.id === req.params.businessId);
     if (businessIndex === -1) {
@@ -642,10 +642,10 @@ router.post("/:businessId/approve", async (req, res) => {
 
     const ownerIndex = users.findIndex((u) => (u.uid || u.id) === business.ownerId);
     const owner = ownerIndex !== -1 ? users[ownerIndex] : null;
-    
+
     if (owner) {
       users[ownerIndex].accountStatus = 'active';
-      
+
       // Set business permissions if provided
       if (permissions && Array.isArray(permissions) && validatePermissions(permissions)) {
         users[ownerIndex].businessPermissions = permissions;
@@ -664,7 +664,7 @@ router.post("/:businessId/approve", async (req, res) => {
       try {
         const appUrl = process.env.APP_URL || process.env.VERCEL_URL || 'http://localhost:4000'
         const loginUrl = `${appUrl}/login`
-        
+
         await sendEmail({
           to: owner.email,
           subject: `Your business account has been approved!`,
@@ -734,7 +734,7 @@ router.post("/:businessId/reject", async (req, res) => {
 
     const ownerIndex = users.findIndex((u) => (u.uid || u.id) === business.ownerId);
     const owner = ownerIndex !== -1 ? users[ownerIndex] : null;
-    
+
     if (owner) {
       users[ownerIndex].accountStatus = 'rejected';
       users[ownerIndex].businessPendingId = null;
@@ -993,10 +993,10 @@ router.post("/members/:memberId/reset-password", async (req, res) => {
 
     const users = await getUsers();
     const requester = users.find(u => (u.uid || u.id) === requesterId);
-    
+
     // Check if requester is super admin
     const isSuperAdmin = requester?.isSuperAdmin === true;
-    
+
     // If not super admin, check if they're a business owner
     let business = null;
     if (!isSuperAdmin) {
@@ -1034,13 +1034,13 @@ router.post("/members/:memberId/reset-password", async (req, res) => {
     try {
       const requesterName = requester?.name || 'Administrator';
       // For super admin, use generic message; for business owner, use business name
-      const businessName = isSuperAdmin 
-        ? 'the system administrator' 
+      const businessName = isSuperAdmin
+        ? 'the system administrator'
         : (business?.businessName || 'your organization');
 
       // Get requester's SMTP config if available, otherwise will use default SMTP
       const requesterSmtpConfig = requester?.smtpConfig || null;
-      
+
       await sendEmail({
         to: member.email,
         subject: 'Password Reset Request',
@@ -1200,14 +1200,14 @@ router.get("/:businessId/permissions", async (req, res) => {
   try {
     await requireSuperAdminAccess(req);
     const { businessId } = req.params;
-    
+
     const businesses = await getBusinesses();
     const business = businesses.find(b => b.id === businessId || b.businessId === businessId);
-    
+
     if (!business) {
       return res.status(404).json({ error: "Business not found" });
     }
-    
+
     // Get business owner
     // IMPORTANT: The owner is the person who OWNS the business (business.ownerId)
     // This is NOT the super admin who is viewing this page
@@ -1218,16 +1218,16 @@ router.get("/:businessId/permissions", async (req, res) => {
       const oId = business.ownerId;
       return uId === oId || String(uId) === String(oId);
     });
-    
+
     // Log for debugging if owner not found
     if (!owner && business.ownerId) {
       console.warn(`Business owner not found for business ${business.id}. Owner ID: ${business.ownerId}`);
     }
-    
+
     // Get all business admins (owners and members with admin role)
     const businessAdmins = [];
     const addedUserIds = new Set(); // Track added user IDs to prevent duplicates
-    
+
     // Always add owner FIRST - business owners should always be shown in permissions management
     // Note: Owners have all permissions and cannot be restricted, but they should appear in the list
     // The owner shown here is the ACTUAL business owner (business.ownerId), not the super admin viewing this page
@@ -1244,52 +1244,52 @@ router.get("/:businessId/permissions", async (req, res) => {
       });
       addedUserIds.add(String(ownerId)); // Mark owner as added
     }
-    
+
     // Add all business members (not just admins) so super admin can manage permissions for any member
     // Super admins should be able to grant permissions to any member, not just those with admin role
     // IMPORTANT: Skip the owner if they're also in the members array to prevent duplicates
     if (business.members && Array.isArray(business.members)) {
       for (const member of business.members) {
         const memberId = String(member.userId);
-        
+
         // Skip if this member is the owner (already added above)
         // Check both uid and id formats to handle different ID storage formats
         if (owner) {
           const ownerUid = owner.uid ? String(owner.uid) : null;
           const ownerId = owner.id ? String(owner.id) : null;
           const ownerIdStr = String(owner.uid || owner.id);
-          
+
           // Skip if member matches owner by any ID format
-          if ((ownerUid && memberId === ownerUid) || 
-              (ownerId && memberId === ownerId) || 
-              memberId === ownerIdStr) {
+          if ((ownerUid && memberId === ownerUid) ||
+            (ownerId && memberId === ownerId) ||
+            memberId === ownerIdStr) {
             continue;
           }
         }
-        
+
         // Skip if already added (shouldn't happen, but safety check)
         if (addedUserIds.has(memberId)) {
           continue;
         }
-        
+
         // Try to find user by both uid and id to handle different ID formats
         const memberUser = users.find(u => {
           const uId = u.uid || u.id;
           const mId = member.userId;
           return uId === mId || String(uId) === String(mId);
         });
-        
+
         // Prioritize businessPermissions from user document, fallback to member.permissions
         const userPermissions = memberUser?.businessPermissions;
         const memberPermissions = member.permissions;
-        const finalPermissions = (Array.isArray(userPermissions) && userPermissions.length > 0) 
-          ? userPermissions 
+        const finalPermissions = (Array.isArray(userPermissions) && userPermissions.length > 0)
+          ? userPermissions
           : (Array.isArray(memberPermissions) && memberPermissions.length > 0 ? memberPermissions : []);
-        
+
         // Determine if member is considered an admin (has admin role OR has business permissions)
         const isAdminRole = member.role === 'admin';
         const hasPermissions = Array.isArray(finalPermissions) && finalPermissions.length > 0;
-        
+
         businessAdmins.push({
           userId: member.userId,
           email: member.email || memberUser?.email || 'Unknown',
@@ -1302,7 +1302,7 @@ router.get("/:businessId/permissions", async (req, res) => {
         addedUserIds.add(memberId); // Mark as added
       }
     }
-    
+
     res.json({
       business: {
         id: business.id,
@@ -1327,23 +1327,23 @@ router.put("/:businessId/permissions/:userId", async (req, res) => {
     await requireSuperAdminAccess(req);
     const { businessId, userId } = req.params;
     const { permissions } = req.body;
-    
+
     // Validate permissions
     if (!Array.isArray(permissions)) {
       return res.status(400).json({ error: "Permissions must be an array" });
     }
-    
+
     if (!validatePermissions(permissions)) {
       return res.status(400).json({ error: "Invalid permission IDs provided" });
     }
-    
+
     const businesses = await getBusinesses();
     const business = businesses.find(b => b.id === businessId || b.businessId === businessId);
-    
+
     if (!business) {
       return res.status(404).json({ error: "Business not found" });
     }
-    
+
     // Check if user is owner or member
     // Super admins can manage permissions for both owners and members
     const isOwner = business.ownerId === userId || String(business.ownerId) === String(userId);
@@ -1351,40 +1351,40 @@ router.put("/:businessId/permissions/:userId", async (req, res) => {
       const mId = m.userId;
       return mId === userId || String(mId) === String(userId);
     });
-    
+
     if (!isOwner && !isMember) {
       return res.status(404).json({ error: "User is not associated with this business" });
     }
-    
+
     // Super admins can update permissions for both owners and members
     // No restriction - super admins have full control
-    
+
     // Update user's business permissions
     const users = await getUsers();
     const userIndex = users.findIndex(u => (u.uid || u.id) === userId);
-    
+
     if (userIndex === -1) {
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     // Update user permissions in users collection
     // Make sure we're updating the correct user object
     const userToUpdate = users[userIndex];
     if (!userToUpdate) {
       return res.status(404).json({ error: "User not found in users array" });
     }
-    
+
     // Update the user's businessPermissions field
     userToUpdate.businessPermissions = permissions;
     userToUpdate.updatedAt = new Date().toISOString();
-    
+
     // Save the updated user - use direct update for better reliability
     try {
       const userDocId = userToUpdate.uid || userToUpdate.id;
       if (!userDocId) {
         return res.status(400).json({ error: "User ID not found" });
       }
-      
+
       if (useFirestore && db) {
         // For Firestore, use update() to merge with existing document
         // This preserves all other fields and only updates businessPermissions
@@ -1394,7 +1394,7 @@ router.put("/:businessId/permissions/:userId", async (req, res) => {
             businessPermissions: permissions,
             updatedAt: new Date().toISOString()
           });
-          
+
           // Verify immediately by reading back
           const verifyDoc = await userDocRef.get();
           if (verifyDoc.exists) {
@@ -1444,7 +1444,7 @@ router.put("/:businessId/permissions/:userId", async (req, res) => {
       console.error('Error saving user permissions:', saveError.message);
       return res.status(500).json({ error: "Failed to save user permissions", details: saveError.message });
     }
-    
+
     // Update in business document (for both owners and members)
     const businessIndex = businesses.findIndex(b => b.id === business.id || b.businessId === business.businessId);
     if (businessIndex !== -1) {
@@ -1460,7 +1460,7 @@ router.put("/:businessId/permissions/:userId", async (req, res) => {
           businesses[businessIndex] = business;
         }
       }
-      
+
       try {
         await saveBusinesses(businesses);
         console.log(`✅ Updated business document for business ${businessId}`);
@@ -1469,7 +1469,7 @@ router.put("/:businessId/permissions/:userId", async (req, res) => {
         // Don't fail the request if business save fails, user update is more important
       }
     }
-    
+
     // Verify the update by reading the user back from Firestore (if using Firestore)
     let verifiedUser = users[userIndex];
     if (useFirestore && db) {
@@ -1485,7 +1485,7 @@ router.put("/:businessId/permissions/:userId", async (req, res) => {
         // Continue with local user data
       }
     }
-    
+
     res.json({
       success: true,
       message: "Permissions updated successfully",
@@ -1510,21 +1510,21 @@ router.delete("/:businessId", async (req, res) => {
   try {
     await requireSuperAdminAccess(req);
     const { businessId } = req.params;
-    
+
     const businesses = await getBusinesses();
     const businessIndex = businesses.findIndex(b => b.id === businessId || b.businessId === businessId);
-    
+
     if (businessIndex === -1) {
       return res.status(404).json({ error: "Business not found" });
     }
-    
+
     const business = businesses[businessIndex];
     const ownerId = business.ownerId;
     const memberIds = business.members?.map(m => m.userId) || [];
-    
+
     // Get all users to update
     const users = await getUsers();
-    
+
     // Update owner's account status
     if (ownerId) {
       const ownerIndex = users.findIndex(u => (u.uid || u.id) === ownerId);
@@ -1537,7 +1537,7 @@ router.delete("/:businessId", async (req, res) => {
         users[ownerIndex].updatedAt = new Date().toISOString();
       }
     }
-    
+
     // Update members' accounts
     for (const memberId of memberIds) {
       const memberIndex = users.findIndex(u => (u.uid || u.id) === memberId);
@@ -1547,13 +1547,13 @@ router.delete("/:businessId", async (req, res) => {
           if (idx === businessIndex) return false;
           return biz.ownerId === memberId;
         });
-        
+
         // Check if member is in another business
         const isMemberElsewhere = businesses.some((biz, idx) => {
           if (idx === businessIndex) return false;
           return biz.members?.some(m => m.userId === memberId);
         });
-        
+
         // Only update if not associated with another business
         if (!isOwnerElsewhere && !isMemberElsewhere) {
           users[memberIndex].accountStatus = 'inactive';
@@ -1563,14 +1563,14 @@ router.delete("/:businessId", async (req, res) => {
         }
       }
     }
-    
+
     // Save updated users
     await saveUsers(users);
-    
+
     // Delete business from businesses array
     businesses.splice(businessIndex, 1);
     await saveBusinesses(businesses);
-    
+
     // Delete from Firestore if using Firestore
     if (useFirestore) {
       try {
@@ -1579,10 +1579,10 @@ router.delete("/:businessId", async (req, res) => {
         console.error('Warning: Failed to delete business from Firestore:', firestoreError.message);
       }
     }
-    
+
     // Note: We don't delete forms, submissions, invoices, or customers automatically
     // as they may contain important historical data. They can be cleaned up separately if needed.
-    
+
     res.json({
       success: true,
       message: `Business "${business.businessName}" has been deleted successfully`,

@@ -11,11 +11,15 @@ function getPropertiesFilePath() {
     return getDataFilePath("properties.json");
 }
 
-// Get all properties
-async function getProperties() {
+// Get all properties (optionally filtered by businessId)
+async function getProperties(businessId = null) {
     if (useFirestore) {
         try {
-            const snap = await getCollectionRef('properties').get();
+            let query = getCollectionRef('properties');
+            if (businessId) {
+                query = query.where('businessId', '==', businessId);
+            }
+            const snap = await query.get();
             const items = [];
             snap.forEach(d => items.push({ id: d.id, ...d.data() }));
             return items;
@@ -27,8 +31,12 @@ async function getProperties() {
     const PROPERTIES_FILE = getPropertiesFilePath();
     try {
         const data = await fs.readFile(PROPERTIES_FILE, "utf8");
-        const properties = JSON.parse(data);
-        return Array.isArray(properties) ? properties : [];
+        let properties = JSON.parse(data);
+        properties = Array.isArray(properties) ? properties : [];
+        if (businessId) {
+            properties = properties.filter(p => p.businessId === businessId);
+        }
+        return properties;
     } catch (error) {
         if (error.code === 'ENOENT') {
             return [];
@@ -66,12 +74,13 @@ router.get("/", async (req, res) => {
             return res.status(401).json({ error: "Not authenticated" });
         }
 
-        const { customerId } = req.query;
-        const properties = await getProperties();
+        const businessId = req.user?.businessId;
+        if (!businessId) {
+            return res.status(400).json({ error: "Business registration required. Please register your business first." });
+        }
 
-        // Filter by user permissions/ownership
-        // In a real app, you'd check if the user owns the properties or the customers they belong to
-        // For now, we assume properties are linked to customers which are linked to users (or business logic)
+        const { customerId } = req.query;
+        const properties = await getProperties(businessId);
 
         // If filtering by customerId
         if (customerId) {
@@ -94,6 +103,11 @@ router.get("/:id", async (req, res) => {
             return res.status(401).json({ error: "Not authenticated" });
         }
 
+        const businessId = req.user?.businessId;
+        if (!businessId) {
+            return res.status(400).json({ error: "Business registration required" });
+        }
+
         let property;
         if (useFirestore) {
             property = await getDoc('properties', req.params.id);
@@ -104,6 +118,11 @@ router.get("/:id", async (req, res) => {
 
         if (!property) {
             return res.status(404).json({ error: "Property not found" });
+        }
+
+        // Verify the property belongs to the user's business
+        if (property.businessId !== businessId) {
+            return res.status(403).json({ error: "Access denied" });
         }
 
         res.json(property);
@@ -121,9 +140,15 @@ router.post("/", async (req, res) => {
             return res.status(401).json({ error: "Not authenticated" });
         }
 
+        const businessId = req.user?.businessId;
+        if (!businessId) {
+            return res.status(400).json({ error: "Business registration required. Please register your business first." });
+        }
+
         const newProperty = {
             id: Date.now().toString(),
             ...req.body,
+            businessId,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             createdBy: userId
@@ -152,6 +177,11 @@ router.put("/:id", async (req, res) => {
             return res.status(401).json({ error: "Not authenticated" });
         }
 
+        const businessId = req.user?.businessId;
+        if (!businessId) {
+            return res.status(400).json({ error: "Business registration required" });
+        }
+
         let property;
         if (useFirestore) {
             property = await getDoc('properties', req.params.id);
@@ -162,6 +192,11 @@ router.put("/:id", async (req, res) => {
 
         if (!property) {
             return res.status(404).json({ error: "Property not found" });
+        }
+
+        // Verify the property belongs to the user's business
+        if (property.businessId !== businessId) {
+            return res.status(403).json({ error: "Access denied" });
         }
 
         const updatedProperty = {
@@ -194,6 +229,28 @@ router.delete("/:id", async (req, res) => {
         const userId = req.user?.uid || req.user?.id;
         if (!userId) {
             return res.status(401).json({ error: "Not authenticated" });
+        }
+
+        const businessId = req.user?.businessId;
+        if (!businessId) {
+            return res.status(400).json({ error: "Business registration required" });
+        }
+
+        // Verify the property exists and belongs to the user's business
+        let property;
+        if (useFirestore) {
+            property = await getDoc('properties', req.params.id);
+        } else {
+            const properties = await getProperties();
+            property = properties.find((p) => p.id === req.params.id);
+        }
+
+        if (!property) {
+            return res.status(404).json({ error: "Property not found" });
+        }
+
+        if (property.businessId !== businessId) {
+            return res.status(403).json({ error: "Access denied" });
         }
 
         if (useFirestore) {

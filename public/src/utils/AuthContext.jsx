@@ -82,8 +82,9 @@ export function AuthProvider({ children }) {
                   membersCount: response.data.membersCount
                 },
                 isBusinessOwner: response.data.isOwner,
-                businessRole: response.data.role,
-                businessPermissions: response.data.permissions || []
+                businessRole: response.data.role
+                // NOTE: businessPermissions already loaded from /auth/account above
+                // Don't overwrite it here!
               })
             }
           }).catch(error => {

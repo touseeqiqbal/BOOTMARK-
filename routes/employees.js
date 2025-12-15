@@ -278,7 +278,7 @@ router.post("/:id/invite", async (req, res) => {
                 businessId: businessId,
                 role: 'employee',
                 employeeId: employee.id,
-                permissions: employee.permissions || [],
+                businessPermissions: employee.permissions || [], // Use businessPermissions for proper permission checking
                 createdAt: new Date().toISOString(),
                 accountStatus: 'active'
             });

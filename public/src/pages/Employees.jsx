@@ -4,6 +4,48 @@ import { Users, Plus, Edit, Trash2, MapPin, Phone, Mail, Award, Clock } from 'lu
 import api from '../utils/api';
 import logo from '../assets/logo.svg';
 
+// Import business permissions for employee permission management
+const EMPLOYEE_PERMISSIONS = [
+    // Customer Management
+    { value: 'customers.view', label: 'View Customers', category: 'Customers' },
+    { value: 'customers.create', label: 'Create Customers', category: 'Customers' },
+    { value: 'customers.edit', label: 'Edit Customers', category: 'Customers' },
+
+    // Property Management
+    { value: 'properties.view', label: 'View Properties', category: 'Properties' },
+    { value: 'properties.create', label: 'Create Properties', category: 'Properties' },
+    { value: 'properties.edit', label: 'Edit Properties', category: 'Properties' },
+
+    // Work Order Management
+    { value: 'workOrders.view', label: 'View Work Orders', category: 'Work Orders' },
+    { value: 'workOrders.create', label: 'Create Work Orders', category: 'Work Orders' },
+    { value: 'workOrders.edit', label: 'Edit Work Orders', category: 'Work Orders' },
+
+    // Invoice Management
+    { value: 'invoices.view', label: 'View Invoices', category: 'Invoices' },
+    { value: 'invoices.create', label: 'Create Invoices', category: 'Invoices' },
+    { value: 'invoices.send', label: 'Send Invoices', category: 'Invoices' },
+
+    // Service & Product Management
+    { value: 'services.view', label: 'View Services', category: 'Services' },
+    { value: 'services.create', label: 'Create Services', category: 'Services' },
+    { value: 'products.view', label: 'View Products', category: 'Products' },
+    { value: 'products.create', label: 'Create Products', category: 'Products' },
+
+    // Scheduling
+    { value: 'scheduling.view', label: 'View Schedules', category: 'Scheduling' },
+    { value: 'scheduling.create', label: 'Create Schedules', category: 'Scheduling' },
+    { value: 'scheduling.edit', label: 'Edit Schedules', category: 'Scheduling' },
+
+    // Reports
+    { value: 'reports.view', label: 'View Reports', category: 'Reports' },
+    { value: 'reports.export', label: 'Export Reports', category: 'Reports' },
+
+    // Team Management
+    { value: 'team.view', label: 'View Team Members', category: 'Team' },
+];
+
+
 export default function Employees() {
     const navigate = useNavigate();
     const [employees, setEmployees] = useState([]);
@@ -461,42 +503,56 @@ export default function Employees() {
 
                             <div className="form-group">
                                 <label>Permissions</label>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '200px', overflowY: 'auto', padding: '8px', border: '1px solid #e5e7eb', borderRadius: '6px' }}>
-                                    {[
-                                        { value: 'view_reports', label: 'View Reports' },
-                                        { value: 'manage_clients', label: 'Manage Clients' },
-                                        { value: 'manage_work_orders', label: 'Manage Work Orders' },
-                                        { value: 'manage_invoices', label: 'Manage Invoices' },
-                                        { value: 'manage_employees', label: 'Manage Employees' },
-                                        { value: 'manage_materials', label: 'Manage Materials' },
-                                        { value: 'view_scheduling', label: 'View Scheduling' },
-                                        { value: 'manage_scheduling', label: 'Manage Scheduling' }
-                                    ].map(permission => (
-                                        <label key={permission.value} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '4px' }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.permissions.includes(permission.value)}
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            permissions: [...prev.permissions, permission.value]
-                                                        }));
-                                                    } else {
-                                                        setFormData(prev => ({
-                                                            ...prev,
-                                                            permissions: prev.permissions.filter(p => p !== permission.value)
-                                                        }));
-                                                    }
-                                                }}
-                                                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                                            />
-                                            <span style={{ fontSize: '14px' }}>{permission.label}</span>
-                                        </label>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '300px', overflowY: 'auto', padding: '12px', border: '1px solid #e5e7eb', borderRadius: '6px', background: '#f9fafb' }}>
+                                    {/* Group permissions by category */}
+                                    {Object.entries(
+                                        EMPLOYEE_PERMISSIONS.reduce((acc, perm) => {
+                                            if (!acc[perm.category]) acc[perm.category] = [];
+                                            acc[perm.category].push(perm);
+                                            return acc;
+                                        }, {})
+                                    ).map(([category, perms]) => (
+                                        <div key={category} style={{ marginBottom: '8px' }}>
+                                            <div style={{
+                                                fontSize: '13px',
+                                                fontWeight: '600',
+                                                color: '#374151',
+                                                marginBottom: '6px',
+                                                paddingBottom: '4px',
+                                                borderBottom: '1px solid #e5e7eb'
+                                            }}>
+                                                {category}
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingLeft: '8px' }}>
+                                                {perms.map(permission => (
+                                                    <label key={permission.value} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '4px' }}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={formData.permissions.includes(permission.value)}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    setFormData(prev => ({
+                                                                        ...prev,
+                                                                        permissions: [...prev.permissions, permission.value]
+                                                                    }));
+                                                                } else {
+                                                                    setFormData(prev => ({
+                                                                        ...prev,
+                                                                        permissions: prev.permissions.filter(p => p !== permission.value)
+                                                                    }));
+                                                                }
+                                                            }}
+                                                            style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                                                        />
+                                                        <span style={{ fontSize: '14px', color: '#4b5563' }}>{permission.label}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                                 <small style={{ color: '#6b7280', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                                    Select permissions for this employee
+                                    Select permissions for this employee. These will apply when they log in to their account.
                                 </small>
                             </div>
 

@@ -117,7 +117,7 @@ You should see: `Email service initialized` in the console.
 - Verify all SMTP variables are set correctly
 - Restart the server after adding/changing `.env` file
 
-### Emails not sending
+ Emails not sending
 
 1. **Check server logs** for error messages
 2. **Verify SMTP credentials** are correct

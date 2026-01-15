@@ -92,9 +92,24 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",  // Required for inline scripts in HTML
+        "https://www.googletagmanager.com",  // Google Analytics
+        "https://www.google-analytics.com"
+      ],
+      imgSrc: ["'self'", "data:", "https:", "https://www.google-analytics.com"],
+      connectSrc: [
+        "'self'",
+        "https://identitytoolkit.googleapis.com",  // Firebase Auth
+        "https://securetoken.googleapis.com",      // Firebase Auth tokens
+        "https://firebase.googleapis.com",         // Firebase config
+        "https://firebaseinstallations.googleapis.com",  // Firebase installations
+        "https://www.google-analytics.com",        // Google Analytics
+        "https://analytics.google.com",            // Google Analytics
+        "wss://*.firebaseio.com",                  // Firebase Realtime Database
+        "https://*.firebaseio.com"                 // Firebase Realtime Database
+      ],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],

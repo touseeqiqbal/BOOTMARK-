@@ -77,7 +77,7 @@ export default function SetPassword() {
                     await login(invitationData.email, password);
 
                     // Redirect to client portal
-                    navigate('/client/dashboard');
+                    navigate('/client-portal');
                 } catch (loginError) {
                     console.error('Auto-login failed:', loginError);
                     // Redirect to login page if auto-login fails

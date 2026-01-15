@@ -1,0 +1,542 @@
+/* ============================================
+   Modern Sidebar Styles
+   ============================================ */
+
+.modern-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--bg-secondary);
+    position: relative;
+}
+
+/* ============================================
+   Sidebar Container
+   ============================================ */
+
+.modern-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-4) var(--space-4);
+    /* Reduced top padding from space-6 */
+    transition: width var(--transition-slow), transform var(--transition-slow);
+    z-index: var(--z-fixed);
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: var(--shadow-2xl);
+}
+
+.modern-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modern-sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modern-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.modern-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.modern-sidebar.collapsed {
+    width: 80px;
+}
+
+/* ============================================
+   Logo Section
+   ============================================ */
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    /* Reduced from space-3 */
+    padding: var(--space-3);
+    /* Reduced from space-4 */
+    margin-bottom: var(--space-4);
+    /* Reduced from space-6 */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all var(--transition-base);
+}
+
+.sidebar-logo.collapsed {
+    justify-content: center;
+}
+
+.logo-image {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-lg);
+    background: white;
+    padding: var(--space-2);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+}
+
+.sidebar-logo:hover .logo-image {
+    transform: rotate(5deg) scale(1.05);
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.logo-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logo-subtitle {
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ============================================
+   User Profile Section
+   ============================================ */
+
+.sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* 8px - very compact */
+    padding: 0.5rem 0.75rem;
+    /* 8px 12px - much smaller */
+    margin-bottom: 0.75rem;
+    /* 12px - reduced */
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.sidebar-profile:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.sidebar-profile.collapsed {
+    justify-content: center;
+    padding: var(--space-2);
+}
+
+.profile-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    /* Reduced from 48px */
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all var(--transition-base);
+}
+
+.sidebar-profile:hover .profile-avatar {
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.profile-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-name {
+    font-size: 14px;
+    /* Reduced from var(--text-sm) */
+    font-weight: 600;
+    color: white;
+    margin: 0 0 2px 0;
+    /* Tighter spacing */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-role {
+    font-size: 11px;
+    /* Smaller */
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   Navigation
+   ============================================ */
+
+.sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    /* Removed gap - no space between sections */
+    overflow-y: auto;
+    padding-right: var(--space-2);
+}
+
+.nav-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    /* No gap between items in section */
+    margin-bottom: 0.5rem;
+    /* Small margin between sections */
+}
+
+.nav-section-title {
+    font-size: 11px;
+    /* Smaller */
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.25rem 0.75rem;
+    /* 4px 12px - very compact */
+    margin-bottom: 0.25rem;
+    /* 4px */
+    margin-top: 0.5rem;
+    /* 8px - small top margin */
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    /* 12px - reduced from 16px */
+    padding: 0.75rem 1rem;
+    /* 12px 16px - reduced from 16px/20px */
+    background: rgba(255, 255, 255, 0.08);
+    /* Beautiful card background */
+    backdrop-filter: blur(10px);
+    /* Glassmorphism effect */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.875rem;
+    /* 14px - slightly reduced */
+    color: rgba(255, 255, 255, 0.9);
+    font-family: var(--font-primary);
+    font-size: 15px;
+    /* Reduced from 16px but still readable */
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 0.375rem;
+    /* 6px - reduced from 8px */
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 1rem;
+}
+
+.nav-item:hover::before {
+    width: 100%;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    /* Brighter on hover */
+    transform: translateX(6px);
+    /* Smooth slide animation */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    /* Shadow effect */
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.2);
+    /* Brightest for active */
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-item.active::before {
+    width: 100%;
+}
+
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: white;
+    border-radius: 0 4px 4px 0;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.nav-item.collapsed {
+    justify-content: center;
+    padding: 1rem;
+    /* 16px */
+}
+
+.nav-icon {
+    flex-shrink: 0;
+    z-index: 1;
+    transition: transform var(--transition-base);
+    width: 22px;
+    /* Slightly larger icons */
+    height: 22px;
+}
+
+.nav-item:hover .nav-icon {
+    transform: scale(1.15);
+    /* More pronounced scale */
+}
+
+.nav-label {
+    flex: 1;
+    z-index: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.nav-indicator {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: white;
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================
+   Sidebar Footer
+   ============================================ */
+
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logout-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* ============================================
+   Sidebar Toggle Button
+   ============================================ */
+
+.sidebar-toggle {
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: none;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    color: var(--primary-600);
+    transition: all var(--transition-base);
+    z-index: 10;
+}
+
+.sidebar-toggle:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: var(--shadow-xl);
+    background: var(--primary-50);
+}
+
+/* ============================================
+   Main Content Area
+   ============================================ */
+
+.modern-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: var(--space-8);
+    transition: margin-left var(--transition-slow);
+    min-height: 100vh;
+    background: var(--bg-secondary);
+}
+
+.modern-content.expanded {
+    margin-left: 80px;
+}
+
+/* ============================================
+   Mobile Styles
+   ============================================ */
+
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: var(--space-4);
+    left: var(--space-4);
+    z-index: calc(var(--z-fixed) + 1);
+    width: 48px;
+    height: 48px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: white;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: all var(--transition-base);
+}
+
+.mobile-menu-btn:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-xl);
+}
+
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: calc(var(--z-fixed) - 1);
+}
+
+.modern-sidebar.mobile {
+    transform: translateX(0);
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mobile-overlay {
+        display: block;
+    }
+
+    .modern-sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+
+    .modern-sidebar.mobile {
+        transform: translateX(0);
+    }
+
+    .modern-sidebar.collapsed {
+        width: 280px;
+    }
+
+    .modern-content {
+        margin-left: 0;
+        padding: var(--space-20) var(--space-4) var(--space-4);
+    }
+
+    .modern-content.expanded {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle {
+        display: none;
+    }
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.modern-sidebar {
+    animation: slideInFromLeft var(--transition-slow) ease-out;
+}
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

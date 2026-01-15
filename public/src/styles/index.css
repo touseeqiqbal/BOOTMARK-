@@ -1,0 +1,378 @@
+/* ============================================
+   Global Styles - Mobile First
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  line-height: var(--leading-normal);
+  font-size: var(--text-sm);
+  /* Mobile default: 14px */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tablet and up: Larger base font */
+@media (min-width: 768px) {
+  body {
+    font-size: var(--text-base);
+    /* 16px */
+  }
+}
+
+/* ============================================
+   Container - Mobile First
+   ============================================ */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  /* Mobile: 16px */
+}
+
+/* Tablet: More padding */
+@media (min-width: 768px) {
+  .container {
+    padding: var(--space-6);
+    /* 24px */
+  }
+}
+
+/* Desktop: Maximum padding and max-width */
+@media (min-width: 1024px) {
+  .container {
+    padding: var(--space-8);
+    /* 32px */
+    max-width: var(--container-xl);
+    /* 1280px */
+  }
+}
+
+/* ============================================
+   Buttons - Mobile First (Touch-Friendly)
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  /* Mobile: 12px 16px */
+  min-height: 44px;
+  /* Touch target */
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Desktop: Smaller, mouse-optimized */
+@media (min-width: 1024px) {
+  .btn {
+    padding: var(--space-2-5) var(--space-4);
+    min-height: 36px;
+    font-size: var(--text-base);
+  }
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Hover only on devices that support it */
+@media (hover: hover) {
+  .btn-primary:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--primary-600);
+  border: 1px solid var(--border-color);
+}
+
+@media (hover: hover) {
+  .btn-secondary:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-600);
+  }
+}
+
+.btn-danger {
+  background: var(--color-error);
+  color: white;
+}
+
+@media (hover: hover) {
+  .btn-danger:hover {
+    background: #dc2626;
+  }
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Button sizes */
+.btn-sm {
+  padding: var(--space-2) var(--space-3);
+  min-height: 36px;
+  font-size: var(--text-xs);
+}
+
+.btn-lg {
+  padding: var(--space-4) var(--space-6);
+  min-height: 52px;
+  font-size: var(--text-lg);
+}
+
+/* ============================================
+   Form Inputs - Mobile First (Touch-Friendly)
+   ============================================ */
+
+.input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  /* Mobile: 12px 16px */
+  min-height: 44px;
+  /* Touch target */
+  font-size: 16px;
+  /* Prevents iOS zoom */
+  font-family: var(--font-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: white;
+  color: var(--text-primary);
+  transition: all var(--transition-base);
+}
+
+/* Desktop: Slightly smaller */
+@media (min-width: 1024px) {
+
+  .input,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  input[type="date"],
+  input[type="time"],
+  textarea,
+  select {
+    min-height: 40px;
+    font-size: var(--text-base);
+  }
+}
+
+.input:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.input:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background: var(--bg-tertiary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.form-group .error {
+  color: var(--color-error);
+  font-size: var(--text-xs);
+  margin-top: var(--space-1);
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background: white !important;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1001;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  background: white !important;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #4f46e5;
+  background: white !important;
+}
+
+
+/* Responsive Modal */
+@media (max-width: 480px) {
+  .modal {
+    padding: 16px;
+    width: 95%;
+    max-height: 95vh;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.close-btn:hover {
+  color: #374151;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+}
+
+/* Responsive Buttons */
+@media (max-width: 480px) {
+  .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}
+
+/* Responsive Inputs */
+@media (max-width: 480px) {
+  .input {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+/* Responsive Cards */
+@media (max-width: 768px) {
+  .card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 12px;
+  }
+}

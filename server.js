@@ -120,7 +120,10 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"]
+      frameSrc: [
+        "https://bootmarkapp.firebaseapp.com",  // Firebase Auth iframe
+        "https://accounts.google.com"           // Google Sign-In
+      ]
     }
   },
   crossOriginEmbedderPolicy: false // Allow embedding if needed

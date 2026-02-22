@@ -102,7 +102,8 @@ app.use(helmet({
         "'self'",
         "'unsafe-inline'",  // Required for inline scripts in HTML
         "https://www.googletagmanager.com",  // Google Analytics
-        "https://www.google-analytics.com"
+        "https://www.google-analytics.com",
+        "https://apis.google.com"            // Firebase Auth (Google Sign-In)
       ],
       imgSrc: ["'self'", "data:", "https:", "https://www.google-analytics.com"],
       connectSrc: [

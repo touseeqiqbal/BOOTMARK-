@@ -1,0 +1,621 @@
+/* ============================================
+   User Management (Clients) - Mobile-First Responsive
+   ============================================ */
+
+.user-management-container {
+  padding: 15px;
+  /* Mobile default */
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .user-management-container {
+    padding: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .user-management-container {
+    padding: 30px;
+  }
+}
+
+/* ============================================
+   Header - Mobile First
+   ============================================ */
+
+.user-management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: column;
+  /* Mobile: stack */
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .user-management-header {
+    flex-direction: row;
+    gap: 0;
+    margin-bottom: 30px;
+  }
+}
+
+.user-management-header h1 {
+  color: #1f2937;
+  font-size: 24px;
+  /* Mobile */
+  margin: 0 0 8px 0;
+}
+
+@media (min-width: 768px) {
+  .user-management-header h1 {
+    font-size: 28px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .user-management-header h1 {
+    font-size: 32px;
+  }
+}
+
+.user-management-header p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ============================================
+   Search Bar - Mobile First
+   ============================================ */
+
+.search-bar {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .search-bar {
+    margin-bottom: 30px;
+  }
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px 12px 48px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  /* Prevents iOS zoom */
+  transition: all 0.2s;
+  min-height: 44px;
+  /* Touch-friendly */
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* ============================================
+   Members Grid - Mobile First
+   ============================================ */
+
+.members-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  /* Mobile: single column */
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .members-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .members-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+  }
+}
+
+/* ============================================
+   Member Cards - Mobile First
+   ============================================ */
+
+.member-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  /* Mobile */
+  transition: all 0.2s;
+}
+
+@media (min-width: 768px) {
+  .member-card {
+    padding: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .member-card {
+    padding: 24px;
+  }
+}
+
+.member-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.member-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  /* Mobile */
+  margin-bottom: 16px;
+}
+
+@media (min-width: 768px) {
+  .member-header {
+    gap: 16px;
+  }
+}
+
+.member-avatar {
+  width: 44px;
+  /* Mobile: touch-friendly */
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .member-avatar {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.member-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  /* Mobile */
+}
+
+@media (min-width: 768px) {
+  .avatar-placeholder {
+    font-size: 18px;
+  }
+}
+
+.member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-info h3 {
+  margin: 0 0 4px 0;
+  color: #1f2937;
+  font-size: 15px;
+  /* Mobile */
+  font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  .member-info h3 {
+    font-size: 16px;
+  }
+}
+
+.member-email {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 13px;
+  /* Mobile */
+  margin: 0;
+  word-break: break-all;
+  /* Prevent overflow on mobile */
+}
+
+@media (min-width: 768px) {
+  .member-email {
+    font-size: 14px;
+    word-break: normal;
+  }
+}
+
+.member-actions {
+  display: flex;
+  gap: 6px;
+  /* Mobile: tighter */
+}
+
+@media (min-width: 768px) {
+  .member-actions {
+    gap: 8px;
+  }
+}
+
+.icon-btn {
+  width: 44px;
+  /* Touch-friendly */
+  height: 44px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #6b7280;
+}
+
+@media (min-width: 768px) {
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.icon-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.icon-btn.danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.member-role {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  /* Mobile: wrap if needed */
+}
+
+.role-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.role-owner {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.role-admin {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.role-manager {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.role-member {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.member-permissions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.permissions-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.permissions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.permission-tag {
+  padding: 2px 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #374151;
+}
+
+.member-meta {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  /* Mobile */
+  color: #6b7280;
+}
+
+@media (min-width: 768px) {
+  .empty-state {
+    padding: 60px 20px;
+  }
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  color: #d1d5db;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  color: #374151;
+  font-size: 18px;
+  /* Mobile */
+}
+
+@media (min-width: 768px) {
+  .empty-state h3 {
+    font-size: 20px;
+  }
+}
+
+/* ============================================
+   Modal - Mobile First
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  /* Mobile */
+}
+
+@media (min-width: 768px) {
+  .modal-overlay {
+    padding: 20px;
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  /* Mobile */
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .modal-content {
+    padding: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .modal-content {
+    padding: 32px;
+  }
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  /* Mobile */
+  color: #1f2937;
+  font-size: 20px;
+}
+
+@media (min-width: 768px) {
+  .modal-content h2 {
+    margin: 0 0 24px 0;
+    font-size: 24px;
+  }
+}
+
+/* ============================================
+   Form Elements - Mobile First
+   ============================================ */
+
+.form-group {
+  margin-bottom: 16px;
+  /* Mobile */
+}
+
+@media (min-width: 768px) {
+  .form-group {
+    margin-bottom: 20px;
+  }
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.form-group .required {
+  color: #ef4444;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 16px;
+  /* Prevents iOS zoom */
+  transition: all 0.2s;
+  min-height: 44px;
+  /* Touch-friendly */
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.input:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.permissions-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  min-height: 44px;
+  /* Touch-friendly */
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  /* Touch-friendly */
+  height: 20px;
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  /* Mobile */
+  flex-direction: column;
+  /* Mobile: stack buttons */
+}
+
+@media (min-width: 640px) {
+  .modal-actions {
+    flex-direction: row;
+    margin-top: 24px;
+  }
+}
+
+/* ============================================
+   Buttons - Mobile First
+   ============================================ */
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Mobile: centered */
+  gap: 8px;
+  padding: 12px 20px;
+  /* Mobile: larger */
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+  /* Touch-friendly */
+  width: 100%;
+  /* Mobile: full width */
+}
+
+@media (min-width: 640px) {
+  .btn {
+    width: auto;
+    padding: 10px 20px;
+    min-height: auto;
+  }
+}
+
+.btn-primary {
+  background: #4f46e5;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #4338ca;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+}

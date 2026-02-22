@@ -1,0 +1,19 @@
+{
+    "name": "bootmark-marketing-site",
+    "version": "1.0.0",
+    "description": "BOOTMARK Marketing Website",
+    "scripts": {
+        "dev": "serve -s . -p 3001",
+        "start": "serve -s . -p 3001"
+    },
+    "keywords": [
+        "bootmark",
+        "marketing",
+        "website"
+    ],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "serve": "^14.2.1"
+    }
+}

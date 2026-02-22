@@ -1,0 +1,126 @@
+{
+    "meta": {
+        "title": "BOOTMARK - Complete Service Management Platform for Field Service Businesses",
+        "description": "BOOTMARK - Complete service management platform for field service businesses. Work orders, scheduling, GPS tracking, invoicing & more. Built for landscaping, plumbing, electrical, HVAC contractors.",
+        "keywords": "service management software, field service management, work order software, GPS crew tracking, landscaping software, plumbing contractor software, HVAC software"
+    },
+    "header": {
+        "features": "Features",
+        "industries": "Industries",
+        "howItWorks": "How It Works",
+        "pricing": "Pricing",
+        "faq": "FAQ",
+        "signIn": "Sign In",
+        "startFreeTrial": "Start Free Trial"
+    },
+    "hero": {
+        "titlePrefix": "Complete Service Management for",
+        "titleHighlight": "Field Service Businesses",
+        "subtitle": "Work orders, scheduling, GPS tracking, invoicing & client portal - all in one platform. Built for landscaping, plumbing, electrical, HVAC, and any field service business.",
+        "ctaStart": "Start Free Trial",
+        "ctaSeeHow": "See How It Works",
+        "feature1": "14-day free trial",
+        "feature2": "No credit card required",
+        "feature3": "Setup in 15 minutes",
+        "altDashboard": "BOOTMARK Dashboard - Work Orders & Scheduling"
+    },
+    "industries": {
+        "title": "Trusted by Service Businesses Across Industries",
+        "landscaping": "Landscaping",
+        "plumbing": "Plumbing",
+        "electrical": "Electrical",
+        "hvac": "HVAC",
+        "contractors": "Contractors",
+        "more": "& More"
+    },
+    "problemSolution": {
+        "title": "Stop Juggling Multiple Tools",
+        "subtitle": "One platform to run your entire field service business",
+        "withoutBootmark": "Without BOOTMARK",
+        "withBootmark": "With BOOTMARK",
+        "problems": {
+            "paperWork": "Paper work orders getting lost",
+            "spreadsheets": "Spreadsheets for scheduling",
+            "noIdea": "No idea where crews are",
+            "lateInvoices": "Invoices sent weeks late",
+            "clientCalls": "Clients calling constantly for updates",
+            "dataEntry": "Entering data in multiple places",
+            "chaos": "Chaos and missed opportunities"
+        },
+        "solutions": {
+            "digitalWork": "Digital work orders on mobile",
+            "visualCalendar": "Visual calendar scheduling",
+            "gpsTracking": "GPS tracking shows crew locations",
+            "autoInvoices": "Auto-generate invoices instantly",
+            "clientPortal": "Client portal for self-service",
+            "sync": "Everything syncs automatically",
+            "profitable": "Professional & profitable business"
+        }
+    },
+    "features": {
+        "title": "Everything You Need to Run Your Business",
+        "subtitle": "Powerful features that work together seamlessly",
+        "workOrder": {
+            "title": "Work Order Management",
+            "desc": "Create detailed work orders with custom fields, photos, and notes. Track from draft to completed to invoiced. Use templates for common jobs."
+        },
+        "scheduling": {
+            "title": "Smart Scheduling",
+            "desc": "Visual calendar with drag-and-drop. Schedule recurring jobs (weekly lawn care, monthly maintenance). Assign crews and track availability."
+        },
+        "gps": {
+            "title": "GPS Time Tracking",
+            "desc": "Crews check in/out with GPS location verification. See where your teams are in real-time. Track actual vs. estimated time for better quotes."
+        },
+        "invoicing": {
+            "title": "Invoicing & Payments",
+            "desc": "Auto-generate professional invoices from completed work orders. Track payments and send reminders. Accept online payments. QuickBooks sync."
+        },
+        "clientPortal": {
+            "title": "Client Portal",
+            "desc": "Clients view their jobs, invoices, and history. Submit service requests online. Download receipts. Reduce phone calls and improve satisfaction."
+        },
+        "materials": {
+            "title": "Materials & Inventory",
+            "desc": "Track materials used per job. Manage inventory levels. Monitor costs and profitability. Categories for all trades (plumbing, electrical, HVAC, etc.)."
+        },
+        "employees": {
+            "title": "Employee Management",
+            "desc": "Manage your team with role-based permissions. Track crew assignments and performance. Mobile access for field teams. Contact information at your fingertips."
+        }
+    },
+    "cta": {
+        "title": "Ready to Transform Your Service Business?",
+        "subtitle": "Join hundreds of field service businesses using BOOTMARK to work smarter, not harder",
+        "startTrial": "Start Free Trial",
+        "scheduleDemo": "Schedule a Demo",
+        "note": "14-day free trial • No credit card required • Setup in 15 minutes",
+        "startTrialUrl": "/register",
+        "demoUrl": "mailto:support@bootmark.com?subject=Schedule a Demo"
+    },
+    "footer": {
+        "desc": "Complete service management platform for field service businesses. Work orders, scheduling, GPS tracking, invoicing & more.",
+        "product": "Product",
+        "industries": "Industries",
+        "company": "Company",
+        "features": "Features",
+        "pricing": "Pricing",
+        "mobileApp": "Mobile App",
+        "integrations": "Integrations",
+        "api": "API",
+        "landscaping": "Landscaping",
+        "plumbing": "Plumbing",
+        "electrical": "Electrical",
+        "hvac": "HVAC",
+        "contractors": "General Contractors",
+        "aboutUs": "About Us",
+        "blog": "Blog",
+        "careers": "Careers",
+        "contact": "Contact",
+        "support": "Support",
+        "copyright": "© 2024 BOOTMARK. All rights reserved.",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "cookie": "Cookie Policy"
+    }
+}

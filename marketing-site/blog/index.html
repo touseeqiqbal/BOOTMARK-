@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="BOOTMARK Blog - Insights, tips, and guides for field service businesses. Learn how to grow your landscaping, plumbing, or HVAC business.">
+    <meta name="keywords"
+        content="field service blog, landscaping tips, plumbing business growth, HVAC management guides">
+    <title>BOOTMARK Blog - Field Service Business Insights</title>
+    <link rel="stylesheet" href="../styles.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --blog-card-bg: #ffffff;
+            --blog-card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 5px 15px -8px rgba(0, 0, 0, 0.05);
+            --blog-card-shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.12);
+        }
+
+        .blog-header {
+            padding: var(--space-24) 0 var(--space-16);
+            background: radial-gradient(circle at top right, rgba(14, 165, 233, 0.05), transparent),
+                radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent);
+            text-align: center;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .blog-header h1 {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+            letter-spacing: -0.02em;
+        }
+
+        .blog-header .section-subtitle {
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.25rem;
+            color: var(--gray-500);
+        }
+
+        .blog-container {
+            max-width: 1200px;
+            margin: -60px auto 0;
+            padding: 0 var(--space-6) var(--space-24);
+            position: relative;
+            z-index: 10;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-8);
+        }
+
+        /* Featured Post Styling */
+        .featured-post {
+            grid-column: 1 / -1;
+            margin-bottom: var(--space-4);
+        }
+
+        .featured-card {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            background: white;
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+            border: 1px solid var(--gray-100);
+        }
+
+        .featured-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .featured-image {
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10rem;
+            min-height: 450px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-image::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            top: -25%;
+            left: -25%;
+            animation: pulse 10s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .featured-content {
+            padding: var(--space-12);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Regular Card Styling */
+        .blog-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--blog-card-shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid var(--gray-50);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--blog-card-shadow-hover);
+            border-color: var(--primary-light);
+        }
+
+        .blog-card-image {
+            height: 240px;
+            background: var(--gray-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .blog-card:hover .blog-card-image {
+            transform: scale(1.02);
+        }
+
+        .blog-card-content {
+            padding: var(--space-8);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .blog-card-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--primary);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: var(--space-4);
+            letter-spacing: 0.05em;
+        }
+
+        .blog-card-title {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-4);
+            line-height: 1.25;
+            color: var(--gray-900);
+            font-weight: 700;
+        }
+
+        .blog-card-excerpt {
+            color: var(--gray-600);
+            font-size: 1rem;
+            margin-bottom: var(--space-6);
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .blog-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--gray-400);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--gray-50);
+        }
+
+        .read-more {
+            color: var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.875rem;
+            margin-top: var(--space-4);
+        }
+
+        .read-more::after {
+            content: '→';
+            transition: var(--transition);
+        }
+
+        .blog-card:hover .read-more::after {
+            transform: translateX(4px);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 1024px) {
+            .blog-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .blog-header h1 {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-card {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-image {
+                min-height: 250px;
+                font-size: 6rem;
+            }
+
+            .featured-content {
+                padding: var(--space-8);
+            }
+
+            .blog-header {
+                padding: var(--space-16) 0 var(--space-20);
+            }
+
+            .blog-container {
+                margin-top: -40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sticky Header -->
+    <header class="header" id="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="../index.html" class="logo">
+                    <img src="../assets/logo.jpeg" alt="BOOTMARK Logo" width="48" height="48" style="object-fit: contain; border-radius: 4px;"
+                        style="border-radius: 4px;">
+                    <span class="logo-text">BOOTMARK</span>
+                </a>
+
+                <nav class="nav" id="nav">
+                    <a href="../index.html#features" class="nav-link">Features</a>
+                    <a href="../index.html#pricing" class="nav-link">Pricing</a>
+                    <a href="index.html" class="nav-link active">Blog</a>
+                </nav>
+                <div class="header-actions">
+                    <a href="/login" class="btn btn-secondary">Sign In</a>
+                    <a href="/register" class="btn btn-primary">Start Free Trial</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="blog-header">
+            <div class="container">
+                <h1 class="gradient-text">BOOTMARK Blog</h1>
+                <p class="section-subtitle">Expert insights, industry trends, and practical guides to help your field
+                    service business thrive.</p>
+            </div>
+        </section>
+
+        <section class="blog-container">
+            <div class="blog-grid">
+                <!-- Featured Post -->
+                <article class="featured-post">
+                    <a href="posts/bootmark-2026-features.html" class="featured-card">
+                        <div class="featured-image">🏗️</div>
+                        <div class="featured-content">
+                            <span class="blog-card-tag" style="background: var(--accent); color: white;">Featured
+                                Update</span>
+                            <h2 class="blog-card-title" style="font-size: 2.5rem;">BOOTMARK 2026: Redefining Field
+                                Service Management</h2>
+                            <p class="blog-card-excerpt">Explore the powerful features driving success for 2026 service
+                                businesses—from live GPS tracking to the all-new professional Client Portal.</p>
+                            <div class="blog-card-footer">
+                                <span>Jan 16, 2026 • 8 min read</span>
+                                <span class="read-more">Read Full Update</span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+
+                <!-- Post 1 -->
+                <article>
+                    <a href="posts/getting-started-with-field-service-software.html" class="blog-card">
+                        <div class="blog-card-image"
+                            style="background: linear-gradient(135deg, #FF9D6C 0%, #BB4E75 100%); color: white;">🚀
+                        </div>
+                        <div class="blog-card-content">
+                            <span class="blog-card-tag">Business Strategy</span>
+                            <h2 class="blog-card-title">How to Choose the Right Field Service Software</h2>
+                            <p class="blog-card-excerpt">Searching for the perfect tool to manage your crews and work
+                                orders? Here's everything you need to know before making a decision.</p>
+                            <div class="blog-card-footer">
+                                <span>Jan 16, 2026</span>
+                                <span>5 min read</span>
+                            </div>
+                            <span class="read-more">Read More</span>
+                        </div>
+                    </a>
+                </article>
+
+                <!-- Post 2 -->
+                <article>
+                    <a href="#" class="blog-card">
+                        <div class="blog-card-image"
+                            style="background: linear-gradient(135deg, #614385 0%, #516395 100%); color: white;">📍
+                        </div>
+                        <div class="blog-card-content">
+                            <span class="blog-card-tag">Operations</span>
+                            <h2 class="blog-card-title">The Benefits of GPS Tracking for Field Teams</h2>
+                            <p class="blog-card-excerpt">Learn how real-time location data can help you reduce fuel
+                                costs and improve customer satisfaction across your service areas.</p>
+                            <div class="blog-card-footer">
+                                <span>Jan 10, 2026</span>
+                                <span>4 min read</span>
+                            </div>
+                            <span class="read-more">Read More</span>
+                        </div>
+                    </a>
+                </article>
+
+                <!-- Post 3 -->
+                <article>
+                    <a href="#" class="blog-card">
+                        <div class="blog-card-image"
+                            style="background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%); color: white;">💰
+                        </div>
+                        <div class="blog-card-content">
+                            <span class="blog-card-tag">Finance</span>
+                            <h2 class="blog-card-title">How to Get Paid Faster: Invoicing Best Practices</h2>
+                            <p class="blog-card-excerpt">Tired of chasing payments? Discover the secrets to professional
+                                invoicing, automated reminders, and seamless client payments.</p>
+                            <div class="blog-card-footer">
+                                <span>Jan 05, 2026</span>
+                                <span>6 min read</span>
+                            </div>
+                            <span class="read-more">Read More</span>
+                        </div>
+                    </a>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-logo">
+                        <img src="../assets/logo.jpeg" alt="BOOTMARK Logo" width="48" height="48" style="object-fit: contain; border-radius: 4px;"
+                            style="border-radius: 4px;">
+                        <span class="logo-text">BOOTMARK</span>
+                    </div>
+                    <p class="footer-description">
+                        Complete service management platform for field service businesses.
+                        Work orders, scheduling, GPS tracking, invoicing & more.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Product</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html#features">Features</a></li>
+                        <li><a href="../index.html#pricing">Pricing</a></li>
+                        <li><a href="#">Mobile App</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="footer-title">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="index.html">Blog</a></li>
+                        <li style="margin-top: 10px; font-size: 0.875rem; color: var(--gray-400);">
+                            <a href="mailto:helpdesk@bootmarkapp.com"
+                                style="display: block; margin-bottom: 5px; color: inherit; text-decoration: none;">📧
+                                helpdesk@bootmarkapp.com</a>
+                            <a href="https://wa.me/923443360585" target="_blank"
+                                style="display: block; margin-bottom: 5px; color: inherit; text-decoration: none;">💬
+                                WhatsApp: +92 344 3360585</a>
+                            <a href="tel:+18666922016" style="display: block; color: inherit; text-decoration: none;">📞
+                                Phone: +1 866 692 2016</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 BOOTMARK. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

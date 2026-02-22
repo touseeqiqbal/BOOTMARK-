@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Allow: /blog/
+Allow: /assets/
+
+Sitemap: https://bootmark.com/sitemap.xml

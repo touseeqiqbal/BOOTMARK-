@@ -1,0 +1,109 @@
+.form-field-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 2px solid transparent;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: var(--bg-secondary);
+  position: relative;
+  user-select: none;
+}
+
+.form-field-wrapper:active {
+  cursor: grabbing;
+}
+
+.form-field-wrapper:hover {
+  background: var(--bg-primary);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.form-field-wrapper.selected {
+  border-color: var(--primary-500);
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+}
+
+.form-field-wrapper.dragging {
+  opacity: 0.4;
+  transform: rotate(2deg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.form-field-wrapper.drag-over {
+  border-color: #4f46e5;
+  border-style: dashed;
+}
+
+.field-handle {
+  cursor: grab;
+  color: #9ca3af;
+  padding: 8px 4px;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  flex-shrink: 0;
+}
+
+.field-handle:active {
+  cursor: grabbing;
+}
+
+.field-handle:hover {
+  color: #4f46e5;
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.field-content {
+  flex: 1;
+  pointer-events: none;
+}
+
+.field-actions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: auto;
+}
+
+.form-field-wrapper:hover .field-actions {
+  opacity: 1;
+}
+
+.icon-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: var(--space-2);
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.icon-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--primary-600);
+  border-color: var(--primary-400);
+  transform: scale(1.1);
+}
+
+.icon-btn.danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}

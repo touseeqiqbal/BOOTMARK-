@@ -1,0 +1,215 @@
+/* ============================================
+   Button Component Styles
+   Extends base .btn styles from index.css
+   ============================================ */
+
+.btn {
+  position: relative;
+  font-family: var(--font-primary);
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Button Variants */
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+  border: none;
+}
+
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--primary-600);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-xs);
+}
+
+@media (hover: hover) {
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--bg-secondary);
+    border-color: var(--primary-600);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid transparent;
+}
+
+@media (hover: hover) {
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary-600);
+  border: 1px solid var(--primary-600);
+}
+
+@media (hover: hover) {
+  .btn-outline:hover:not(:disabled) {
+    background: var(--primary-600);
+    color: white;
+  }
+}
+
+.btn-danger {
+  background: var(--color-error);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (hover: hover) {
+  .btn-danger:hover:not(:disabled) {
+    background: #dc2626;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-danger:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Button States */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  pointer-events: none;
+}
+
+.btn-loading {
+  color: transparent;
+  pointer-events: none;
+}
+
+.btn-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Button Sizes - Touch targets enforced on mobile */
+.btn-sm {
+  padding: var(--space-2) var(--space-3);
+  min-height: 44px; /* WCAG AA minimum on mobile */
+  font-size: var(--text-xs);
+  gap: var(--space-1-5);
+}
+
+@media (min-width: 1024px) {
+  .btn-sm {
+    min-height: 36px; /* Smaller on desktop */
+  }
+}
+
+.btn-md {
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px; /* WCAG AA minimum */
+  font-size: var(--text-sm);
+  gap: var(--space-2);
+}
+
+@media (min-width: 1024px) {
+  .btn-md {
+    padding: var(--space-2-5) var(--space-4);
+    min-height: 36px; /* Smaller on desktop */
+    font-size: var(--text-base);
+  }
+}
+
+.btn-lg {
+  padding: var(--space-4) var(--space-6);
+  min-height: 52px; /* Larger touch target */
+  font-size: var(--text-lg);
+  gap: var(--space-3);
+}
+
+@media (min-width: 1024px) {
+  .btn-lg {
+    min-height: 44px; /* Still accessible on desktop */
+  }
+}
+
+/* Button Width */
+.btn-full-width {
+  width: 100%;
+}
+
+/* Icon Positioning */
+.btn-icon-left,
+.btn-icon-right {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.btn-icon-left {
+  margin-right: var(--space-1);
+}
+
+.btn-icon-right {
+  margin-left: var(--space-1);
+}
+
+.btn-content {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Focus States for Accessibility */
+.btn:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+.btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* RTL Support */
+[dir="rtl"] .btn-icon-left {
+  margin-right: 0;
+  margin-left: var(--space-1);
+}
+
+[dir="rtl"] .btn-icon-right {
+  margin-left: 0;
+  margin-right: var(--space-1);
+}
+

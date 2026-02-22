@@ -1,0 +1,164 @@
+/* ============================================
+   Page Header Component - Responsive
+   ============================================ */
+
+.page-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.page-header-top {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+    .page-header-top {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+}
+
+.page-header-title-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+    min-width: 0;
+}
+
+.page-header-icon {
+    flex-shrink: 0;
+    color: var(--primary-600);
+}
+
+.page-header-text {
+    min-width: 0;
+}
+
+.page-header-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: var(--leading-tight);
+}
+
+.page-header-subtitle {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin: var(--space-1) 0 0 0;
+    line-height: var(--leading-normal);
+}
+
+/* Actions Container - Responsive */
+.page-header-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .page-header-actions {
+        flex-direction: row;
+        width: auto;
+        flex-shrink: 0;
+    }
+}
+
+.page-header-actions-primary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .page-header-actions-primary {
+        width: auto;
+        flex-wrap: nowrap;
+    }
+}
+
+/* Mobile: Stack buttons vertically on very small screens */
+@media (max-width: 480px) {
+    .page-header-actions-primary {
+        flex-direction: column;
+    }
+
+    .page-header-actions-primary > * {
+        width: 100%;
+    }
+
+    .page-header-actions-primary button,
+    .page-header-actions-primary .btn-modern {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Button group styling for view mode toggles */
+.page-header-actions-primary .btn-group {
+    display: flex;
+    gap: var(--space-1);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-1);
+    background: var(--bg-primary);
+}
+
+/* Overflow menu for secondary actions on mobile */
+.page-header-actions-overflow {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .page-header-actions-overflow {
+        display: block;
+    }
+
+    /* Hide secondary actions on mobile, show in overflow */
+    .page-header-actions-secondary {
+        display: none;
+    }
+}
+
+@media (min-width: 768px) {
+    .page-header-actions-overflow {
+        display: none;
+    }
+
+    .page-header-actions-secondary {
+        display: flex;
+        gap: var(--space-2);
+        align-items: center;
+    }
+}
+
+/* Breadcrumbs */
+.page-header-breadcrumbs {
+    margin-bottom: var(--space-2);
+}
+
+/* Ensure buttons don't overflow */
+.page-header-actions button,
+.page-header-actions .btn-modern {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 44px; /* Touch target */
+}
+
+@media (min-width: 768px) {
+    .page-header-actions button,
+    .page-header-actions .btn-modern {
+        min-width: auto;
+    }
+}
+

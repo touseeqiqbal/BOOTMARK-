@@ -1,0 +1,342 @@
+/* RTL (Right-to-Left) Support Styles */
+/* Applied when dir="rtl" is set on html element */
+
+/* General RTL adjustments */
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="rtl"] body {
+    direction: rtl;
+}
+
+/* Flexbox direction reversals */
+[dir="rtl"] .flex-row {
+    flex-direction: row-reverse;
+}
+
+/* Text alignment */
+[dir="rtl"] .text-left {
+    text-align: right;
+}
+
+[dir="rtl"] .text-right {
+    text-align: left;
+}
+
+/* Margins and padding - use logical properties where possible */
+[dir="rtl"] .ml-auto {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+[dir="rtl"] .mr-auto {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+/* Sidebar */
+[dir="rtl"] .modern-sidebar {
+    left: auto;
+    right: 0;
+}
+
+[dir="rtl"] .modern-sidebar.collapsed {
+    transform: translateX(100%);
+}
+
+[dir="rtl"] .sidebar-toggle {
+    left: 0;
+    right: auto;
+}
+
+[dir="rtl"] .nav-indicator {
+    left: 0;
+    right: auto;
+}
+
+/* Icons that should flip */
+[dir="rtl"] .icon-flip {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .chevron-left,
+[dir="rtl"] .chevron-right,
+[dir="rtl"] .arrow-left,
+[dir="rtl"] .arrow-right {
+    transform: scaleX(-1);
+}
+
+/* Dropdowns */
+[dir="rtl"] .dropdown-menu {
+    left: auto;
+    right: 0;
+}
+
+/* Forms */
+[dir="rtl"] input[type="checkbox"],
+[dir="rtl"] input[type="radio"] {
+    margin-left: 8px;
+    margin-right: 0;
+}
+
+[dir="rtl"] .form-group label {
+    text-align: right;
+}
+
+/* Tables */
+[dir="rtl"] table {
+    direction: rtl;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+    text-align: right;
+}
+
+[dir="rtl"] th:first-child,
+[dir="rtl"] td:first-child {
+    text-align: right;
+}
+
+/* Buttons with icons */
+[dir="rtl"] .btn svg {
+    margin-left: 8px;
+    margin-right: 0;
+}
+
+[dir="rtl"] .btn svg:first-child {
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+/* Cards */
+[dir="rtl"] .card {
+    text-align: right;
+}
+
+/* Modals */
+[dir="rtl"] .modal-header {
+    text-align: right;
+}
+
+[dir="rtl"] .modal-footer {
+    flex-direction: row-reverse;
+}
+
+/* Breadcrumbs */
+[dir="rtl"] .breadcrumb {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .breadcrumb-separator {
+    transform: scaleX(-1);
+}
+
+/* Pagination */
+[dir="rtl"] .pagination {
+    flex-direction: row-reverse;
+}
+
+/* Tooltips */
+[dir="rtl"] .tooltip {
+    text-align: right;
+}
+
+/* Notifications */
+[dir="rtl"] .notification {
+    text-align: right;
+}
+
+[dir="rtl"] .notification-icon {
+    margin-left: 12px;
+    margin-right: 0;
+}
+
+/* Progress bars */
+[dir="rtl"] .progress-bar {
+    transform-origin: right;
+}
+
+/* Tabs */
+[dir="rtl"] .tabs {
+    flex-direction: row-reverse;
+}
+
+/* Search inputs */
+[dir="rtl"] .search-input {
+    padding-left: 16px;
+    padding-right: 40px;
+}
+
+[dir="rtl"] .search-icon {
+    left: auto;
+    right: 12px;
+}
+
+/* Close buttons */
+[dir="rtl"] .close-btn,
+[dir="rtl"] .modal-close {
+    left: 16px;
+    right: auto;
+}
+
+/* Badges */
+[dir="rtl"] .badge {
+    margin-left: 8px;
+    margin-right: 0;
+}
+
+/* Lists */
+[dir="rtl"] ul,
+[dir="rtl"] ol {
+    padding-left: 0;
+    padding-right: 20px;
+}
+
+/* Calendar */
+[dir="rtl"] .calendar {
+    direction: rtl;
+}
+
+[dir="rtl"] .calendar-header {
+    flex-direction: row-reverse;
+}
+
+/* Work Order Cards */
+[dir="rtl"] .work-order-card {
+    text-align: right;
+}
+
+/* Invoice */
+[dir="rtl"] .invoice-header {
+    text-align: right;
+}
+
+[dir="rtl"] .invoice-total {
+    text-align: left;
+}
+
+/* Dashboard Stats */
+[dir="rtl"] .stat-card {
+    text-align: right;
+}
+
+[dir="rtl"] .stat-icon {
+    margin-left: 16px;
+    margin-right: 0;
+}
+
+/* Mobile Menu */
+[dir="rtl"] .mobile-menu-btn {
+    left: auto;
+    right: 16px;
+}
+
+[dir="rtl"] .mobile-overlay {
+    left: 0;
+    right: auto;
+}
+
+/* Data Grid */
+[dir="rtl"] .data-grid {
+    direction: rtl;
+}
+
+[dir="rtl"] .grid-cell {
+    text-align: right;
+}
+
+/* Specific component overrides */
+[dir="rtl"] .auth-container {
+    direction: rtl;
+}
+
+[dir="rtl"] .auth-card {
+    text-align: right;
+}
+
+[dir="rtl"] .hero-content {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .feature-card {
+    text-align: right;
+}
+
+/* Number inputs - keep LTR for numbers */
+[dir="rtl"] input[type="number"],
+[dir="rtl"] input[type="tel"],
+[dir="rtl"] .number-input {
+    direction: ltr;
+    text-align: left;
+}
+
+/* Email inputs - keep LTR */
+[dir="rtl"] input[type="email"],
+[dir="rtl"] .email-input {
+    direction: ltr;
+    text-align: left;
+}
+
+/* URL inputs - keep LTR */
+[dir="rtl"] input[type="url"],
+[dir="rtl"] .url-input {
+    direction: ltr;
+    text-align: left;
+}
+
+/* Code blocks - keep LTR */
+[dir="rtl"] code,
+[dir="rtl"] pre {
+    direction: ltr;
+    text-align: left;
+}
+
+/* Animations for RTL */
+@keyframes slideInRight-rtl {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft-rtl {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+[dir="rtl"] .slide-in-right {
+    animation: slideInRight-rtl 0.3s ease;
+}
+
+[dir="rtl"] .slide-in-left {
+    animation: slideInLeft-rtl 0.3s ease;
+}
+
+/* Scrollbar for RTL */
+[dir="rtl"] ::-webkit-scrollbar {
+    left: 0;
+    right: auto;
+}
+
+/* Print styles for RTL */
+@media print {
+    [dir="rtl"] {
+        direction: rtl;
+    }
+
+    [dir="rtl"] .invoice,
+    [dir="rtl"] .contract,
+    [dir="rtl"] .report {
+        text-align: right;
+    }
+}

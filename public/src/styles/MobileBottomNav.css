@@ -1,0 +1,105 @@
+/* ============================================
+   Mobile Bottom Navigation
+   ============================================ */
+
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: var(--z-fixed);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding-bottom: env(safe-area-inset-bottom);
+    /* Safe area for devices with notches */
+}
+
+/* Hide on desktop */
+@media (min-width: 1024px) {
+    .mobile-bottom-nav {
+        display: none;
+    }
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    flex: 1;
+    padding: var(--space-2);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    min-height: 64px;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+}
+
+.mobile-nav-item:active {
+    transform: scale(0.95);
+}
+
+.mobile-nav-icon {
+    transition: all var(--transition-base);
+}
+
+.mobile-nav-label {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    transition: all var(--transition-base);
+}
+
+.mobile-nav-item.active {
+    color: var(--primary-600);
+}
+
+.mobile-nav-item.active .mobile-nav-icon {
+    transform: scale(1.1);
+}
+
+.mobile-nav-item.active .mobile-nav-label {
+    font-weight: 600;
+}
+
+/* Active indicator dot */
+.mobile-nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    width: 4px;
+    height: 4px;
+    background: var(--primary-600);
+    border-radius: 50%;
+}
+
+/* Hover effect for devices that support it */
+@media (hover: hover) {
+    .mobile-nav-item:hover:not(.active) {
+        color: var(--text-primary);
+        background: var(--bg-secondary);
+    }
+}
+
+/* Focus states for accessibility */
+.mobile-nav-item:focus-visible {
+    outline: 2px solid var(--primary-500);
+    outline-offset: -2px;
+    border-radius: var(--radius-md);
+}
+
+/* Adjust main content padding on mobile to account for bottom nav */
+@media (max-width: 1023px) {
+    .modern-content {
+        padding-bottom: 80px !important;
+    }
+}
+

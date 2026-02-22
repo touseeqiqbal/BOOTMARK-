@@ -1,0 +1,36 @@
+{
+    "meta": {
+        "title": "BOOTMARK - Plataforma Completa de Gestión de Servicios",
+        "description": "BOOTMARK - Plataforma completa de gestión para empresas de servicios de campo.",
+        "keywords": "software de gestión de servicios, gestión de servicios de campo"
+    },
+    "header": {
+        "features": "Características",
+        "industries": "Industrias",
+        "howItWorks": "Cómo Funciona",
+        "pricing": "Precios",
+        "faq": "Preguntas Frecuentes",
+        "signIn": "Iniciar Sesión",
+        "startFreeTrial": "Prueba Gratis"
+    },
+    "hero": {
+        "titlePrefix": "Gestión Completa de Servicios para",
+        "titleHighlight": "Empresas de Campo",
+        "subtitle": "Órdenes de trabajo, programación, rastreo GPS, facturación y portal de clientes - todo en una plataforma.",
+        "ctaStart": "Prueba Gratis",
+        "ctaSeeHow": "Ver Cómo Funciona",
+        "feature1": "Prueba gratuita de 14 días",
+        "feature2": "No se requiere tarjeta de crédito",
+        "feature3": "Configuración en 15 minutos",
+        "altDashboard": "Panel de Control BOOTMARK"
+    },
+    "industries": {
+        "title": "Con la Confianza de Empresas de Servicios",
+        "landscaping": "Paisajismo",
+        "plumbing": "Fontanería",
+        "electrical": "Electricidad",
+        "hvac": "Climatización",
+        "contractors": "Contratistas",
+        "more": "y Más"
+    }
+}

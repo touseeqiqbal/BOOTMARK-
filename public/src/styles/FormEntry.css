@@ -1,0 +1,105 @@
+.form-entry-page {
+  min-height: 100vh;
+  background: #f3f4f6;
+}
+
+.form-entry-header {
+  background: #111827;
+  color: #fff;
+  padding: 32px 0;
+}
+
+.form-entry-header .header-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.form-entry-header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.form-entry-header p {
+  margin: 0;
+  opacity: 0.85;
+}
+
+.form-entry-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  padding: 32px;
+  margin: -40px auto 40px;
+  max-width: 960px;
+}
+
+.form-entry-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.form-entry-card-header .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e0e7ff;
+  color: #312e81;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.success-banner {
+  background: #ecfdf5;
+  border: 1px solid #34d399;
+  color: #065f46;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.entry-field {
+  margin-bottom: 24px;
+}
+
+.entry-label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.entry-label .required {
+  color: #dc2626;
+  margin-left: 6px;
+}
+
+.entry-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.entry-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.empty-message {
+  color: #6b7280;
+  font-style: italic;
+}
+

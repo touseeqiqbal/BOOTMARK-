@@ -1,0 +1,226 @@
+/* ============================================
+   Onboarding Tour Styles
+   ============================================ */
+
+.tour-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: var(--z-modal-backdrop);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.tour-highlight {
+    position: relative;
+    z-index: calc(var(--z-modal-backdrop) + 1) !important;
+    outline: 3px solid var(--primary-500) !important;
+    outline-offset: 4px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px rgba(14, 165, 233, 0.5) !important;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px rgba(14, 165, 233, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 30px rgba(14, 165, 233, 0.8);
+    }
+}
+
+.tour-tooltip {
+    position: fixed;
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    padding: var(--space-6);
+    max-width: 400px;
+    width: calc(100% - var(--space-8));
+    z-index: calc(var(--z-modal-backdrop) + 2);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tour-tooltip[data-position="bottom"] {
+    bottom: var(--space-6);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tour-tooltip[data-position="right"] {
+    right: var(--space-6);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.tour-tooltip[data-position="left"] {
+    left: var(--space-6);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.tour-tooltip[data-position="top"] {
+    top: var(--space-6);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tour-progress {
+    height: 4px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+}
+
+.tour-progress-bar {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+    transition: width 0.3s ease-out;
+}
+
+.tour-tooltip-header {
+    margin-bottom: var(--space-4);
+}
+
+.tour-tooltip-title {
+    margin: 0;
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.tour-tooltip-content {
+    margin: 0 0 var(--space-6) 0;
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary);
+}
+
+.tour-tooltip-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.tour-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2-5) var(--space-4);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    min-height: 40px;
+}
+
+.tour-btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.tour-btn-primary:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.tour-btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.tour-btn-secondary:hover {
+    background: var(--bg-tertiary);
+}
+
+.tour-btn-skip {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: var(--space-2);
+}
+
+.tour-btn-skip:hover {
+    color: var(--text-primary);
+}
+
+.tour-close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: var(--space-1);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+}
+
+.tour-close-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.tour-step-indicator {
+    text-align: center;
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+    font-weight: 500;
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+    .tour-tooltip {
+        max-width: none;
+        width: calc(100% - var(--space-4));
+        padding: var(--space-4);
+    }
+
+    .tour-tooltip[data-position="right"],
+    .tour-tooltip[data-position="left"] {
+        right: var(--space-4);
+        left: var(--space-4);
+        top: auto;
+        bottom: var(--space-4);
+        transform: none;
+    }
+
+    .tour-tooltip-footer {
+        flex-direction: column;
+    }
+
+    .tour-tooltip-footer > div {
+        width: 100%;
+        display: flex;
+        gap: var(--space-2);
+    }
+
+    .tour-btn {
+        flex: 1;
+    }
+}
+
